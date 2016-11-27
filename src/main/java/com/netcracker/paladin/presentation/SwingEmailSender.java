@@ -130,7 +130,7 @@ public class SwingEmailSender extends JFrame {
         }
 
         try {
-            emailUtility.sendEmail(toAddress, subject, message, attachFiles);
+            emailUtility.sendEmail(toAddress, subject, encryptionUtility.encryptEmail(message, toAddress), attachFiles);
 
             JOptionPane.showMessageDialog(this,
                     "The e-mail has been sent successfully!");

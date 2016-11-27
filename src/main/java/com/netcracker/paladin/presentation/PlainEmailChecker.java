@@ -120,7 +120,7 @@ public class PlainEmailChecker {
 
         //check if the content is plain text
         if (p.isMimeType("text/plain")) {
-            System.out.println("This is plain text");
+            System.out.println("This is plain text (encrypted!)");
             System.out.println("---------------------------");
             System.out.println((String) p.getContent());
         }

@@ -11,7 +11,7 @@
 
     <context:property-placeholder location="classpath:persistence-mysql.properties" />
 
-    <bean id="publicKeyEntryRepositoryImpl" class="com.netcracker.paladin.infrastructure.repositories.PublicKeyEntryRepositoryImpl">
+    <bean id="publicKeyEntryRepository" class="com.netcracker.paladin.infrastructure.repositories.PublicKeyEntryRepositoryImpl">
         <constructor-arg name="dataSource" ref="dataSource"/>
     </bean>
 
@@ -32,18 +32,17 @@
     </bean>
 
     <bean id="encryptionUtility" class="com.netcracker.paladin.application.encryption.EncryptionUtilityImpl">
-        <constructor-arg name="configUtility" ref="configUtility"/>
+        <constructor-arg name="publicKeyEntryRepository" ref="publicKeyEntryRepository"/>
+        <constructor-arg name="asymmetricEncryption" ref="asymmetricEncryption"/>
+        <constructor-arg name="symmetricEncryption" ref="symmetricEncryption"/>
+        <constructor-arg name="sessionKeygen" ref="sessionKeygen"/>
     </bean>
 
     <bean id="swingEmailSender" class="com.netcracker.paladin.presentation.SwingEmailSender">
         <constructor-arg name="configUtility" ref="configUtility"/>
         <constructor-arg name="emailUtility" ref="emailUtility"/>
+        <constructor-arg name="encryptionUtility" ref="encryptionUtility"/>
     </bean>
-
-    <!--<bean id="swingEmailReader" class="com.netcracker.paladin.presentation.SwingEmailReader">-->
-        <!--<constructor-arg name="configUtility" ref="configUtility"/>-->
-        <!--<constructor-arg name="emailUtility" ref="emailUtility"/>-->
-    <!--</bean>-->
 
     <bean id="dataSource"
           class="org.springframework.jdbc.datasource.DriverManagerDataSource">
