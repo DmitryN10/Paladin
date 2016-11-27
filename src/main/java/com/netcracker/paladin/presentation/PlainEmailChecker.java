@@ -9,14 +9,14 @@ import java.util.Properties;
 
 public class PlainEmailChecker {
 
-    private static ConfigUtility configUtil = new ConfigUtility();
+    private static ConfigUtility configUtility = new ConfigUtility();
     private static final String storeType = "pop3";
 
     public static void check()
     {
         try {
             //create properties field
-            Properties properties = configUtil.loadProperties();
+            Properties properties = configUtility.loadProperties();
             Session emailSession = Session.getDefaultInstance(properties);
 
             //create the POP3 store object and connect with the pop server

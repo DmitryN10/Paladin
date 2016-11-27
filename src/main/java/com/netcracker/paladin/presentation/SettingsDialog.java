@@ -11,7 +11,7 @@ import java.util.Properties;
 
 public class SettingsDialog extends JDialog {
 
-    private ConfigUtility configUtil;
+    private ConfigUtility configUtility;
 
     private JLabel labelHost = new JLabel("Host name: ");
     private JLabel labelPort = new JLabel("Port number: ");
@@ -25,9 +25,9 @@ public class SettingsDialog extends JDialog {
 
     private JButton buttonSave = new JButton("Save");
 
-    public SettingsDialog(JFrame parent, ConfigUtility configUtil) {
+    public SettingsDialog(JFrame parent, ConfigUtility configUtility) {
         super(parent, "SMTP Settings", true);
-        this.configUtil = configUtil;
+        this.configUtility = configUtility;
 
         setupForm();
 
@@ -87,7 +87,7 @@ public class SettingsDialog extends JDialog {
     private void loadSettings() {
         Properties configProps = null;
         try {
-            configProps = configUtil.loadProperties();
+            configProps = configUtility.loadProperties();
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this,
                     "Error reading settings: " + ex.getMessage(),
@@ -102,7 +102,7 @@ public class SettingsDialog extends JDialog {
 
     private void buttonSaveActionPerformed(ActionEvent event) {
         try {
-            configUtil.saveProperties(textHost.getText(),
+            configUtility.saveProperties(textHost.getText(),
                     textPort.getText(),
                     textUser.getText(),
                     textPass.getText());

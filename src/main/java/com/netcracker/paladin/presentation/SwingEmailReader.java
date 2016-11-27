@@ -15,8 +15,8 @@ import java.util.List;
 import static com.netcracker.paladin.presentation.PlainEmailChecker.check;
 
 public class SwingEmailReader extends JFrame {
-    private final ConfigUtility configUtil;
-    private final EmailUtility emailUtil;
+    private final ConfigUtility configUtility;
+    private final EmailUtility emailUtility;
 
     private static final String storeType = "pop3";
     private List<MessageEntry> messageContainerList;
@@ -41,13 +41,13 @@ public class SwingEmailReader extends JFrame {
 
     private GridBagConstraints constraints = new GridBagConstraints();
 
-    public SwingEmailReader(ConfigUtility configUtil, EmailUtility emailUtil){
+    public SwingEmailReader(ConfigUtility configUtility, EmailUtility emailUtility){
         super("Swing E-mail Reader Program");
 
-        this.configUtil = configUtil;
-        this.emailUtil = emailUtil;
+        this.configUtility = configUtility;
+        this.emailUtility = emailUtility;
 
-        this.messageContainerList = emailUtil.readEmails();
+        this.messageContainerList = emailUtility.readEmails();
 
         // set up layout
         setLayout(new GridBagLayout());
@@ -70,7 +70,7 @@ public class SwingEmailReader extends JFrame {
     private void setupMenu() {
 //        menuItemSetting.addActionListener(new ActionListener() {
 //            public void actionPerformed(ActionEvent event) {
-//                SettingsDialog dialog = new SettingsDialog(SwingEmailSender.this, configUtil);
+//                SettingsDialog dialog = new SettingsDialog(SwingEmailSender.this, configUtility);
 //                dialog.setVisible(true);
 //            }
 //        });
@@ -154,7 +154,7 @@ public class SwingEmailReader extends JFrame {
 //        }
 //
 //        try {
-//            Properties smtpProperties = configUtil.loadProperties();
+//            Properties smtpProperties = configUtility.loadProperties();
 //            EmailUtility.sendEmail(smtpProperties, toAddress, subject, message, attachFiles);
 //
 //            JOptionPane.showMessageDialog(this,
@@ -169,7 +169,7 @@ public class SwingEmailReader extends JFrame {
 
     public  void launch() {
 
-        List<MessageEntry> messageContainerList = emailUtil.readEmails();
+        List<MessageEntry> messageContainerList = emailUtility.readEmails();
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -180,7 +180,7 @@ public class SwingEmailReader extends JFrame {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    SwingEmailReader swingEmailReader = new SwingEmailReader(configUtil, emailUtil);
+                    SwingEmailReader swingEmailReader = new SwingEmailReader(configUtility, emailUtility);
                     swingEmailReader.setVisible(true);
                 }catch (Exception e){
                     e.printStackTrace();

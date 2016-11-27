@@ -8,10 +8,10 @@ import java.security.SecureRandom;
 /**
  * Created by ivan on 27.11.16.
  */
-public class ChebiKeyGen implements KeyGen {
+public class ChebiKeygen implements SessionKeygen {
     private final KeyGenerator keyGenerator;
 
-    public ChebiKeyGen() {
+    public ChebiKeygen() {
         try {
             keyGenerator = KeyGenerator.getInstance("AES");
             keyGenerator.init(128, new SecureRandom());

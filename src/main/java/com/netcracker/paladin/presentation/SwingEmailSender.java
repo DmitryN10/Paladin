@@ -3,6 +3,7 @@ package com.netcracker.paladin.presentation;
 /**
  * Created by ivan on 26.11.16.
  */
+import com.netcracker.paladin.application.encryption.EncryptionUtility;
 import com.netcracker.paladin.infrastructure.ConfigUtility;
 import com.netcracker.paladin.infrastructure.mail.EmailUtility;
 
@@ -13,8 +14,9 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 public class SwingEmailSender extends JFrame {
-    private final ConfigUtility configUtil;
-    private final EmailUtility emailUtil;
+    private final ConfigUtility configUtility;
+    private final EmailUtility emailUtility;
+    private final EncryptionUtility encryptionUtility;
 
     private JMenuBar menuBar = new JMenuBar();
     private JMenu menuFile = new JMenu("File");
@@ -34,11 +36,12 @@ public class SwingEmailSender extends JFrame {
 
     private GridBagConstraints constraints = new GridBagConstraints();
 
-    public SwingEmailSender(ConfigUtility configUtil, EmailUtility emailUtil) {
+    public SwingEmailSender(ConfigUtility configUtility, EmailUtility emailUtility, EncryptionUtility encryptionUtility) {
         super("Swing E-mail Sender Program");
 
-        this.configUtil = configUtil;
-        this.emailUtil = emailUtil;
+        this.configUtility = configUtility;
+        this.emailUtility = emailUtility;
+        this.encryptionUtility = encryptionUtility;
 
         // set up layout
         setLayout(new GridBagLayout());
@@ -56,7 +59,7 @@ public class SwingEmailSender extends JFrame {
     private void setupMenu() {
         menuItemSetting.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                SettingsDialog dialog = new SettingsDialog(SwingEmailSender.this, configUtil);
+                SettingsDialog dialog = new SettingsDialog(SwingEmailSender.this, configUtility);
                 dialog.setVisible(true);
             }
         });
@@ -127,8 +130,7 @@ public class SwingEmailSender extends JFrame {
         }
 
         try {
-//            Properties smtpProperties = configUtil.loadProperties();
-            emailUtil.sendEmail(toAddress, subject, message, attachFiles);
+            emailUtility.sendEmail(toAddress, subject, message, attachFiles);
 
             JOptionPane.showMessageDialog(this,
                     "The e-mail has been sent successfully!");
@@ -178,7 +180,7 @@ public class SwingEmailSender extends JFrame {
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                new SwingEmailSender(configUtil, emailUtil).setVisible(true);
+                new SwingEmailSender(configUtility, emailUtility, encryptionUtility).setVisible(true);
             }
         });
     }

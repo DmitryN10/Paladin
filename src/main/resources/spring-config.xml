@@ -15,21 +15,34 @@
         <constructor-arg name="dataSource" ref="dataSource"/>
     </bean>
 
+    <bean id="asymmetricEncryption" class="com.netcracker.paladin.application.encryption.asymmetric.Rsa">
+    </bean>
+
+    <bean id="symmetricEncryption" class="com.netcracker.paladin.application.encryption.symmetric.Aes">
+    </bean>
+
+    <bean id="sessionKeygen" class="com.netcracker.paladin.application.encryption.sessionkeygen.ChebiKeygen">
+    </bean>
+
     <bean id="configUtility" class="com.netcracker.paladin.infrastructure.ConfigUtility">
     </bean>
 
     <bean id="emailUtility" class="com.netcracker.paladin.infrastructure.mail.EmailUtility">
-        <constructor-arg name="configUtil" ref="configUtility"/>
+        <constructor-arg name="configUtility" ref="configUtility"/>
+    </bean>
+
+    <bean id="encryptionUtility" class="com.netcracker.paladin.application.encryption.EncryptionUtilityImpl">
+        <constructor-arg name="configUtility" ref="configUtility"/>
     </bean>
 
     <bean id="swingEmailSender" class="com.netcracker.paladin.presentation.SwingEmailSender">
-        <constructor-arg name="configUtil" ref="configUtility"/>
-        <constructor-arg name="emailUtil" ref="emailUtility"/>
+        <constructor-arg name="configUtility" ref="configUtility"/>
+        <constructor-arg name="emailUtility" ref="emailUtility"/>
     </bean>
 
     <!--<bean id="swingEmailReader" class="com.netcracker.paladin.presentation.SwingEmailReader">-->
-        <!--<constructor-arg name="configUtil" ref="configUtility"/>-->
-        <!--<constructor-arg name="emailUtil" ref="emailUtility"/>-->
+        <!--<constructor-arg name="configUtility" ref="configUtility"/>-->
+        <!--<constructor-arg name="emailUtility" ref="emailUtility"/>-->
     <!--</bean>-->
 
     <bean id="dataSource"

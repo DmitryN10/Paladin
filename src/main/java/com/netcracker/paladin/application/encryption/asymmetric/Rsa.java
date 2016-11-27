@@ -9,7 +9,7 @@ import java.security.*;
 import java.security.spec.RSAPrivateCrtKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 
-public class RSA implements AsymmetricEncryption {
+public class Rsa implements AsymmetricEncryption {
 
     private final String ALGORITHM = "RSA";
 

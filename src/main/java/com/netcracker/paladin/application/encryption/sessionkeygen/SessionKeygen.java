@@ -5,6 +5,6 @@ import java.security.Key;
 /**
  * Created by ivan on 27.11.16.
  */
-public interface KeyGen {
+public interface SessionKeygen {
     Key generateKey();
 }

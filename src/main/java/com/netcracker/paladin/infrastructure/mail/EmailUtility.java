@@ -16,16 +16,16 @@ import java.util.Properties;
 
 public class EmailUtility {
 
-    private final ConfigUtility configUtil;
+    private final ConfigUtility configUtility;
 
-    public EmailUtility(ConfigUtility configUtil) {
-        this.configUtil = configUtil;
+    public EmailUtility(ConfigUtility configUtility) {
+        this.configUtility = configUtility;
     }
 
     public void sendEmail(String toAddress, String subject, String message, File[] attachFiles)
             throws AddressException, MessagingException, IOException {
 
-        Properties smtpProperties = configUtil.loadProperties();
+        Properties smtpProperties = configUtility.loadProperties();
         final String userName = smtpProperties.getProperty("mail.user");
         final String password = smtpProperties.getProperty("mail.password");
 
@@ -79,7 +79,7 @@ public class EmailUtility {
     public List<MessageEntry> readEmails() {
         try {
             //create properties field
-            Properties properties = configUtil.loadProperties();
+            Properties properties = configUtility.loadProperties();
             Session emailSession = Session.getDefaultInstance(properties);
 
             //create the POP3 store object and connect with the pop server

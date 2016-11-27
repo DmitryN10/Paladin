@@ -11,7 +11,7 @@ import java.util.Base64;
 /**
  * Created by ivan on 27.11.16.
  */
-public class AES implements SymmetricEncryption {
+public class Aes implements SymmetricEncryption {
 
     private  SecretKeySpec secretKey;
     private  byte[] key;
