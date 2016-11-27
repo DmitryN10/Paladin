@@ -12,7 +12,7 @@ public interface AsymmetricEncryption {
 
     PublicKey generatePublicKey(PrivateKey privateKey);
 
-    byte[] encrypt(String text, PublicKey key);
+    String encrypt(String text, PublicKey key);
 
-    String decrypt(byte[] text, PrivateKey key);
+    String decrypt(String text, PrivateKey key);
 }

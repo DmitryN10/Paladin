@@ -5,10 +5,8 @@ import com.netcracker.paladin.infrastructure.ConfigUtility;
 
 import javax.mail.*;
 import javax.mail.internet.*;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -38,17 +36,18 @@ public class EmailUtility {
         Session session = Session.getInstance(smtpProperties, auth);
 
         // creates a new e-mail message
-        Message msg = new MimeMessage(session);
+        MimeMessage msg = new MimeMessage(session);
 
         msg.setFrom(new InternetAddress(userName));
         InternetAddress[] toAddresses = { new InternetAddress(toAddress) };
         msg.setRecipients(Message.RecipientType.TO, toAddresses);
-        msg.setSubject(subject);
+        msg.setSubject(subject, "UTF-8");
         msg.setSentDate(new Date());
 
         // creates message part
         MimeBodyPart messageBodyPart = new MimeBodyPart();
-        messageBodyPart.setContent(message, "text/html");
+//        messageBodyPart.setContent(message, "text/html");
+        messageBodyPart.setText(message, "UTF-8");
 
         // creates multi-part
         Multipart multipart = new MimeMultipart();
@@ -94,8 +93,7 @@ public class EmailUtility {
             Folder emailFolder = store.getFolder("INBOX");
             emailFolder.open(Folder.READ_ONLY);
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    System.in));
+//            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
             // retrieve the messages from the folder in an array and print it
             Message[] messages = emailFolder.getMessages();

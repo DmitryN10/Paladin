@@ -34,14 +34,19 @@ public class EncryptionUtilityImpl implements EncryptionUtility {
     public String encryptEmail(String plainText, String recipient){
         Key sessionKey = sessionKeygen.generateKey();
         String cipherText = symmetricEncryption.encrypt(plainText, sessionKey.toString());
-        String encryptedSessionKey = new String(asymmetricEncryption.encrypt(sessionKey.toString(), getKeyPair().getPublic()));
+        String encryptedSessionKey = asymmetricEncryption.encrypt(sessionKey.toString(), getKeyPair().getPublic());
+//        System.out.println("Key: "+encryptedSessionKey);
+//        System.out.println("Message: "+cipherText);
         cipherText = encryptedSessionKey+cipherText;
+        System.out.println(encryptedSessionKey.length());
         return cipherText;
     }
 
     @Override
     public String decryptEmail(String cipherText){
-        return cipherText;
+        String sessionKey = asymmetricEncryption.decrypt(cipherText.substring(0, 172), getKeyPair().getPrivate());
+        String plainText = symmetricEncryption.decrypt(cipherText.substring(172), sessionKey);
+        return plainText;
     }
 
 //    public PublicKey generatePublicKey(){

@@ -8,6 +8,7 @@ import javax.crypto.Cipher;
 import java.security.*;
 import java.security.spec.RSAPrivateCrtKeySpec;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.Base64;
 
 public class Rsa implements AsymmetricEncryption {
 
@@ -44,35 +45,28 @@ public class Rsa implements AsymmetricEncryption {
     }
 
     @Override
-    public byte[] encrypt(String text, PublicKey key) {
-        byte[] cipherText = null;
+    public String encrypt(String text, PublicKey key) {
         try {
-            // get an RSA cipher object and print the provider
             final Cipher cipher = Cipher.getInstance(ALGORITHM);
-            // encrypt the plain text using the public key
             cipher.init(Cipher.ENCRYPT_MODE, key);
-            cipherText = cipher.doFinal(text.getBytes());
+            return Base64.getEncoder().encodeToString(cipher.doFinal(text.getBytes("UTF-8")));
         } catch (Exception e) {
             e.printStackTrace();
+            throw new IllegalStateException(e);
         }
-        return cipherText;
     }
 
     @Override
-    public String decrypt(byte[] text, PrivateKey key) {
-        byte[] dectyptedText = null;
+    public String decrypt(String text, PrivateKey key) {
         try {
             // get an RSA cipher object and print the provider
             final Cipher cipher = Cipher.getInstance(ALGORITHM);
-
             // decrypt the text using the private key
             cipher.init(Cipher.DECRYPT_MODE, key);
-            dectyptedText = cipher.doFinal(text);
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            return new String(cipher.doFinal(Base64.getDecoder().decode(text)));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IllegalStateException(e);
         }
-
-        return new String(dectyptedText);
     }
 }
