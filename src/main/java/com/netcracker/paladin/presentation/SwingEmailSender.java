@@ -31,9 +31,10 @@ public class SwingEmailSender extends JFrame {
 
     private JButton buttonSend = new JButton("SEND");
 
-    private JFilePicker filePicker = new JFilePicker("Attached", "Attach File...");
+//    private JFilePicker filePicker = new JFilePicker("Attached", "Attach File...");
 
     private JTextArea textAreaMessage = new JTextArea(10, 30);
+//    private JScrollPane textAreaScrollPane = n;
 
     private GridBagConstraints constraints = new GridBagConstraints();
 
@@ -104,8 +105,8 @@ public class SwingEmailSender extends JFrame {
         constraints.gridy = 2;
         constraints.gridheight = 1;
         constraints.gridwidth = 3;
-        filePicker.setMode(JFilePicker.MODE_OPEN);
-        add(filePicker, constraints);
+//        filePicker.setMode(JFilePicker.MODE_OPEN);
+//        add(filePicker, constraints);
 
         constraints.gridy = 3;
         constraints.weightx = 1.0;
@@ -125,17 +126,17 @@ public class SwingEmailSender extends JFrame {
 
         File[] attachFiles = null;
 
-        if (!filePicker.getSelectedFilePath().equals("")) {
-            File selectedFile = new File(filePicker.getSelectedFilePath());
-            attachFiles = new File[] {selectedFile};
-        }
+//        if (!filePicker.getSelectedFilePath().equals("")) {
+//            File selectedFile = new File(filePicker.getSelectedFilePath());
+//            attachFiles = new File[] {selectedFile};
+//        }
 
         try {
             System.out.println("Sending...");
             emailUtility.sendEmail(toAddress,
                                     subject,
-                                    encryptionUtility.decryptEmail(encryptionUtility.encryptEmail(message, toAddress)),
-//                                    "Foo",
+//                                    encryptionUtility.decryptEmail(encryptionUtility.encryptEmail(message, toAddress)),
+                                    "Message is encrypted",
                                     encryptionUtility.encryptEmail(message, toAddress));
 
             System.out.println("Reading...");
@@ -144,7 +145,7 @@ public class SwingEmailSender extends JFrame {
                 System.out.println("Subject: "+entry.getSubject());
                 System.out.println("Text: "+entry.getText());
                 if(entry.getCipherBlob() != null){
-//                    System.out.println("Hidden message: "+encryptionUtility.decryptEmail(entry.getCipherBlob()));
+                    System.out.println("Encrypted message: "+encryptionUtility.decryptEmail(entry.getCipherBlob()));
                 }
                 System.out.println();
             }
@@ -188,7 +189,6 @@ public class SwingEmailSender extends JFrame {
     }
 
     public void launch() {
-        // set look and feel to system dependent
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception ex) {

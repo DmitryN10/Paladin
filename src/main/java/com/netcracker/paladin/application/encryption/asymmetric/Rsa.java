@@ -84,7 +84,6 @@ public class Rsa implements AsymmetricEncryption {
     public byte[] decrypt(byte[] sequenceToDecrypt, PrivateKey privateKey) {
         try {
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
-            System.out.println("Size of ecrypted session key: "+sequenceToDecrypt.length);
             return cipher.doFinal(sequenceToDecrypt);
         } catch (Exception e) {
             e.printStackTrace();
