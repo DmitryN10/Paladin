@@ -4,7 +4,9 @@ import com.netcracker.paladin.application.encryption.asymmetric.AsymmetricEncryp
 import com.netcracker.paladin.application.encryption.sessionkeygen.SessionKeygen;
 import com.netcracker.paladin.application.encryption.symmetric.SymmetricEncryption;
 import com.netcracker.paladin.infrastructure.repositories.PublicKeyEntryRepository;
+import org.apache.commons.lang3.ArrayUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.security.Key;
 import java.security.KeyPair;
 
@@ -28,32 +30,45 @@ public class EncryptionUtilityImpl implements EncryptionUtility {
         this.asymmetricEncryption = asymmetricEncryption;
         this.symmetricEncryption = symmetricEncryption;
         this.sessionKeygen = sessionKeygen;
+        this.keyPair = asymmetricEncryption.generateKeyPair();
     }
 
     @Override
-    public String encryptEmail(String plainText, String recipient){
-        Key sessionKey = sessionKeygen.generateKey();
-        String cipherText = symmetricEncryption.encrypt(plainText, sessionKey.toString());
-        String encryptedSessionKey = asymmetricEncryption.encrypt(sessionKey.toString(), getKeyPair().getPublic());
-//        System.out.println("Key: "+encryptedSessionKey);
-//        System.out.println("Message: "+cipherText);
-        cipherText = encryptedSessionKey+cipherText;
-        System.out.println(encryptedSessionKey.length());
-        return cipherText;
+    public byte[] encryptEmail(String plainText, String recipient){
+        try {
+            Key sessionKey = sessionKeygen.generateKey();
+            byte[] cipherText = symmetricEncryption.encrypt(plainText.getBytes("UTF-8"), sessionKey.getEncoded());
+            byte[] encryptedSessionKey = asymmetricEncryption.encrypt(sessionKey.getEncoded(), getKeyPair().getPublic().getEncoded());
+//            System.out.println("Text: "+cipherText.length);
+//            System.out.println("Key: "+encryptedSessionKey.length);
+            return ArrayUtils.addAll(encryptedSessionKey, cipherText);
+        }catch (UnsupportedEncodingException e){
+            e.printStackTrace();
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override
-    public String decryptEmail(String cipherText){
-        String sessionKey = asymmetricEncryption.decrypt(cipherText.substring(0, 172), getKeyPair().getPrivate());
-        String plainText = symmetricEncryption.decrypt(cipherText.substring(172), sessionKey);
-        return plainText;
+    public String decryptEmail(byte[] cipherTextAndEncryptedSessionKey){
+        try {
+            byte[] encryptedSessionKey = ArrayUtils.subarray(cipherTextAndEncryptedSessionKey, 0, 128);
+            byte[] cipherText = ArrayUtils.subarray(cipherTextAndEncryptedSessionKey, 128, cipherTextAndEncryptedSessionKey.length);
+
+            byte[] sessionKey = asymmetricEncryption.decrypt(encryptedSessionKey, getKeyPair().getPrivate());
+            byte[] plainText = symmetricEncryption.decrypt(cipherText, sessionKey);
+            return new String(plainText, "UTF-8");
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new IllegalStateException(e);
+        }
     }
 
 //    public PublicKey generatePublicKey(){
 //        return asymmetricEncryption.generatePublicKey();
 //    }
 
+    @Override
     public KeyPair getKeyPair(){
-        return asymmetricEncryption.generateKeyPair();
+        return keyPair;
     }
 }

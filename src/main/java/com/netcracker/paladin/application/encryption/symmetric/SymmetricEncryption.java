@@ -4,9 +4,10 @@ package com.netcracker.paladin.application.encryption.symmetric;
  * Created by ivan on 27.11.16.
  */
 public interface SymmetricEncryption {
-//    void setKey(String myKey);
 
-    String encrypt(String stringToEncrypt, String sessionKey);
+    void setKey(byte[] key);
 
-    String decrypt(String stringToDecrypt, String sessionKey);
+    byte[] encrypt(byte[] sequenceToEncrypt, byte[] sessionKey);
+
+    byte[] decrypt(byte[] sequenceToDecrypt, byte[] sessionKey);
 }

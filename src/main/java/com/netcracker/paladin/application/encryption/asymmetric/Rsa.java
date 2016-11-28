@@ -5,21 +5,35 @@ package com.netcracker.paladin.application.encryption.asymmetric;
  */
 
 import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
 import java.security.*;
 import java.security.spec.RSAPrivateCrtKeySpec;
 import java.security.spec.RSAPublicKeySpec;
-import java.util.Base64;
+import java.security.spec.X509EncodedKeySpec;
 
 public class Rsa implements AsymmetricEncryption {
 
     private final String ALGORITHM = "RSA";
+    private final int KEYSIZE = 1024;
+    private final KeyFactory keyFactory;
+    private final Cipher cipher;
+    private final KeyPairGenerator keyPairGenerator;
+
+    public Rsa() {
+        try {
+            keyFactory = KeyFactory.getInstance(ALGORITHM);
+            cipher = Cipher.getInstance(ALGORITHM);
+            keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM);
+            keyPairGenerator.initialize(KEYSIZE);
+        }catch (NoSuchAlgorithmException | NoSuchPaddingException e){
+            throw new IllegalStateException(e);
+        }
+    }
 
     @Override
     public KeyPair generateKeyPair() {
         try {
-            final KeyPairGenerator keyGen = KeyPairGenerator.getInstance(ALGORITHM);
-            keyGen.initialize(1024);
-            return keyGen.generateKeyPair();
+            return keyPairGenerator.generateKeyPair();
         } catch (Exception e) {
             e.printStackTrace();
             throw new IllegalStateException(e);
@@ -45,11 +59,10 @@ public class Rsa implements AsymmetricEncryption {
     }
 
     @Override
-    public String encrypt(String text, PublicKey key) {
+    public byte[] encrypt(byte[] sequenceToEncrypt, PublicKey publicKey) {
         try {
-            final Cipher cipher = Cipher.getInstance(ALGORITHM);
-            cipher.init(Cipher.ENCRYPT_MODE, key);
-            return Base64.getEncoder().encodeToString(cipher.doFinal(text.getBytes("UTF-8")));
+            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+            return cipher.doFinal(sequenceToEncrypt);
         } catch (Exception e) {
             e.printStackTrace();
             throw new IllegalStateException(e);
@@ -57,13 +70,30 @@ public class Rsa implements AsymmetricEncryption {
     }
 
     @Override
-    public String decrypt(String text, PrivateKey key) {
+    public byte[] encrypt(byte[] sequenceToEncrypt, byte[] publicKeyBytes) {
         try {
-            // get an RSA cipher object and print the provider
-            final Cipher cipher = Cipher.getInstance(ALGORITHM);
-            // decrypt the text using the private key
-            cipher.init(Cipher.DECRYPT_MODE, key);
-            return new String(cipher.doFinal(Base64.getDecoder().decode(text)));
+            return encrypt(sequenceToEncrypt, keyFactory.generatePublic(new X509EncodedKeySpec(publicKeyBytes)));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IllegalStateException(e);
+        }
+    }
+
+    @Override
+    public byte[] decrypt(byte[] sequenceToDecrypt, PrivateKey privateKey) {
+        try {
+            cipher.init(Cipher.DECRYPT_MODE, privateKey);
+            return cipher.doFinal(sequenceToDecrypt);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IllegalStateException(e);
+        }
+    }
+
+    @Override
+    public byte[] decrypt(byte[] sequenceToDecrypt, byte[] privateKeyBytes) {
+        try {
+            return encrypt(sequenceToDecrypt, keyFactory.generatePublic(new X509EncodedKeySpec(privateKeyBytes)));
         } catch (Exception e) {
             e.printStackTrace();
             throw new IllegalStateException(e);
