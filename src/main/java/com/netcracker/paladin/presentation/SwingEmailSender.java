@@ -130,13 +130,10 @@ public class SwingEmailSender extends JFrame {
         }
 
         try {
-            byte[] encrypted = encryptionUtility.encryptEmail(message, toAddress);
-//            emailUtility.sendEmail(toAddress, subject, "Message is encrypted", attachFiles);
-////            emailUtility.sendEmail(toAddress, subject, message, attachFiles);
-//            System.out.println("Original: "+message);
-//            System.out.println("Encrypted: "+encrypted);
-//            String decrypted = encryptionUtility.decryptEmail(encrypted);
-//            System.out.println("Decrypted: "+decrypted);
+            emailUtility.sendEmail(toAddress,
+                                    subject,
+                                    "Message is encrypted",
+                                    encryptionUtility.encryptEmail(message, toAddress));
 
             JOptionPane.showMessageDialog(this,
                     "The e-mail has been sent successfully!");
