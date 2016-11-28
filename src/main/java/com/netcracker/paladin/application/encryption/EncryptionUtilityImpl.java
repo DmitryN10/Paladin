@@ -38,7 +38,7 @@ public class EncryptionUtilityImpl implements EncryptionUtility {
         try {
             Key sessionKey = sessionKeygen.generateKey();
             byte[] cipherText = symmetricEncryption.encrypt(plainText.getBytes("UTF-8"), sessionKey.getEncoded());
-            byte[] encryptedSessionKey = asymmetricEncryption.encrypt(sessionKey.getEncoded(), getKeyPair().getPublic().getEncoded());
+            byte[] encryptedSessionKey = asymmetricEncryption.encrypt(sessionKey.getEncoded(), getKeyPair().getPublic());
 //            System.out.println("Text: "+cipherText.length);
 //            System.out.println("Key: "+encryptedSessionKey.length);
             return ArrayUtils.addAll(encryptedSessionKey, cipherText);
@@ -54,7 +54,7 @@ public class EncryptionUtilityImpl implements EncryptionUtility {
             byte[] encryptedSessionKey = ArrayUtils.subarray(cipherTextAndEncryptedSessionKey, 0, 128);
             byte[] cipherText = ArrayUtils.subarray(cipherTextAndEncryptedSessionKey, 128, cipherTextAndEncryptedSessionKey.length);
 
-            byte[] sessionKey = asymmetricEncryption.decrypt(encryptedSessionKey, getKeyPair().getPrivate().getEncoded());
+            byte[] sessionKey = asymmetricEncryption.decrypt(encryptedSessionKey, getKeyPair().getPrivate());
             byte[] plainText = symmetricEncryption.decrypt(cipherText, sessionKey);
             return new String(plainText, "UTF-8");
         }catch (Exception e){

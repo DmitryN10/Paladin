@@ -2,16 +2,17 @@ package com.netcracker.paladin.infrastructure.mail;
 
 import com.netcracker.paladin.domain.MessageEntry;
 import com.netcracker.paladin.infrastructure.ConfigUtility;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.MultiPartEmail;
 
 import javax.activation.DataSource;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Part;
+import javax.mail.*;
 import javax.mail.internet.AddressException;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.util.ByteArrayDataSource;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -46,7 +47,7 @@ public class EmailUtility {
             email.addTo(toAddress);
 
 //            InputStream is = new BufferedInputStream(new ByteArrayInputStream(cipherBlob));
-            DataSource source = new ByteArrayDataSource(cipherBlob, "text/plain");
+            DataSource source = new ByteArrayDataSource(cipherBlob, "application/python-pickle");
             email.attach(source, "Chebi", "Naum molodec");
 
             email.send();
@@ -56,108 +57,62 @@ public class EmailUtility {
     }
 
     public List<MessageEntry> readEmails() {
-//        try {
-//            //create properties field
-//            Properties properties = configUtility.loadProperties();
-//            Session emailSession = Session.getDefaultInstance(properties);
-//
-//            //create the POP3 store object and connect with the pop server
-//            Store store = emailSession.getStore("pop3s");
-//
-//            store.connect(
-//                    properties.getProperty("mail.smtp.host"),
-//                    properties.getProperty("mail.user"),
-//                    properties.getProperty("mail.password"));
-//
-//            // create the folder object and open it
-//            Folder emailFolder = store.getFolder("INBOX");
-//            emailFolder.open(Folder.READ_ONLY);
-//
-////            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-//
-//            // retrieve the messages from the folder in an array and print it
-//            Message[] messages = emailFolder.getMessages();
-//            List<MessageEntry> messageContainerList = new ArrayList<>(messages.length);
-//
-//            System.out.println("Size messages: "+messages.length);
-//
-//            for(Message message : messages){
-//                MessageEntry messageContainer = new MessageEntry();
-//                messageContainer.setFrom(message.getFrom()[0].toString());
-//                messageContainer.setSubject(message.getSubject());
-//                messageContainer.setText(getText(message));
-//                messageContainerList.add(messageContainer);
-//            }
-//
-//            System.out.println("Size: "+messageContainerList.size());
-//
-////            for (int i = 0; i < messages.length; i++) {
-////                Message message = messages[i];
-////                System.out.println("---------------------------------");
-////                writePart(message);
-////                String line = reader.readLine();
-////                if ("YES".equals(line)) {
-////                    message.writeTo(System.out);
-////                    message.
-////                } else if ("QUIT".equals(line)) {
-////                    break;
-////                }
-////            }
-//
-//
-//
-//            // close the store and folder objects
-//            emailFolder.close(false);
-//            store.close();
-//
-//            return messageContainerList;
-//
-//        } catch (NoSuchProviderException e) {
-//            e.printStackTrace();
-//            throw new IllegalStateException();
-//        } catch (MessagingException e) {
-//            e.printStackTrace();
-//            throw new IllegalStateException();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            throw new IllegalStateException();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            throw new IllegalStateException();
-//        }
-        return null;
-    }
+        try {
+            Properties properties = configUtility.loadProperties();
+            Session emailSession = Session.getDefaultInstance(properties);
 
-//            //create the folder object and open it
-//            Folder emailFolder = store.getFolder("INBOX");
-//            emailFolder.open(Folder.READ_ONLY);
-//
-//            // retrieve the messages from the folder in an array and print it
-//            Message[] messages = emailFolder.getMessages();
-//            System.out.println("messages.length---" + messages.length);
-//
-//            for (int i = 0, n = messages.length; i < n; i++) {
-//                Message message = messages[i];
-//                System.out.println("---------------------------------");
-//                System.out.println("Email Number " + (i + 1));
-//                System.out.println("Subject: " + message.getSubject());
-//                System.out.println("From: " + message.getFrom()[0]);
-//                System.out.println("Text: " + message.getContent().toString());
-//
-//            }
-//
-//            //close the store and folder objects
-//            emailFolder.close(false);
-//            store.close();
-//
-//        } catch (NoSuchProviderException e) {
-//            e.printStackTrace();
-//        } catch (MessagingException e) {
-//            e.printStackTrace();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
+            Store store = emailSession.getStore("pop3s");
+            store.connect(
+                    properties.getProperty("mail.smtp.host"),
+                    properties.getProperty("mail.user"),
+                    properties.getProperty("mail.password"));
+            
+            Folder emailFolder = store.getFolder("INBOX");
+            emailFolder.open(Folder.READ_ONLY);
+
+            Message[] messages = emailFolder.getMessages();
+            List<MessageEntry> messageEntryList = new ArrayList<>(messages.length);
+            
+            for(Message message : messages){
+
+                MessageEntry messageEntry = new MessageEntry();
+
+                messageEntry.setFrom(message.getFrom()[0].toString());
+                messageEntry.setSubject(message.getSubject());
+                messageEntry.setText(getText(message));
+                messageEntryList.add(messageEntry);
+
+                String contentType = message.getContentType();
+                if (contentType.contains("multipart")) {
+                    Multipart multiPart = (Multipart) message.getContent();
+                    for (int i = 0; i < multiPart.getCount(); i++) {
+                        MimeBodyPart part = (MimeBodyPart) multiPart.getBodyPart(i);
+                        if (Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition())) {
+                            if(part.getFileName().equals("Chebi")){
+                                byte[] cipherBlob = IOUtils.toByteArray(part.getInputStream());
+                                messageEntry.setCipherBlob(cipherBlob);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            return messageEntryList;
+            
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+            throw new IllegalStateException();
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            throw new IllegalStateException();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new IllegalStateException();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IllegalStateException();
+        }
+    }
 
     private static String getText(Part p) throws MessagingException, IOException {
         if (p.isMimeType("text/*")) {

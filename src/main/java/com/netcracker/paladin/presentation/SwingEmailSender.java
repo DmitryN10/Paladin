@@ -4,6 +4,7 @@ package com.netcracker.paladin.presentation;
  * Created by ivan on 26.11.16.
  */
 import com.netcracker.paladin.application.encryption.EncryptionUtility;
+import com.netcracker.paladin.domain.MessageEntry;
 import com.netcracker.paladin.infrastructure.ConfigUtility;
 import com.netcracker.paladin.infrastructure.mail.EmailUtility;
 
@@ -130,10 +131,23 @@ public class SwingEmailSender extends JFrame {
         }
 
         try {
+            System.out.println("Sending...");
             emailUtility.sendEmail(toAddress,
                                     subject,
-                                    "Message is encrypted",
+                                    encryptionUtility.decryptEmail(encryptionUtility.encryptEmail(message, toAddress)),
+//                                    "Foo",
                                     encryptionUtility.encryptEmail(message, toAddress));
+
+            System.out.println("Reading...");
+            for(MessageEntry entry : emailUtility.readEmails()){
+                System.out.println("From: "+entry.getFrom());
+                System.out.println("Subject: "+entry.getSubject());
+                System.out.println("Text: "+entry.getText());
+                if(entry.getCipherBlob() != null){
+//                    System.out.println("Hidden message: "+encryptionUtility.decryptEmail(entry.getCipherBlob()));
+                }
+                System.out.println();
+            }
 
             JOptionPane.showMessageDialog(this,
                     "The e-mail has been sent successfully!");

@@ -7,6 +7,7 @@ package com.netcracker.paladin.application.encryption.asymmetric;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import java.security.*;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPrivateCrtKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -83,6 +84,7 @@ public class Rsa implements AsymmetricEncryption {
     public byte[] decrypt(byte[] sequenceToDecrypt, PrivateKey privateKey) {
         try {
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
+            System.out.println("Size of ecrypted session key: "+sequenceToDecrypt.length);
             return cipher.doFinal(sequenceToDecrypt);
         } catch (Exception e) {
             e.printStackTrace();
@@ -93,7 +95,7 @@ public class Rsa implements AsymmetricEncryption {
     @Override
     public byte[] decrypt(byte[] sequenceToDecrypt, byte[] privateKeyBytes) {
         try {
-            return encrypt(sequenceToDecrypt, keyFactory.generatePublic(new X509EncodedKeySpec(privateKeyBytes)));
+            return decrypt(sequenceToDecrypt, keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes)));
         } catch (Exception e) {
             e.printStackTrace();
             throw new IllegalStateException(e);
