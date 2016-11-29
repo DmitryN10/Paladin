@@ -9,6 +9,11 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+    <properties>
+        <spring.version>4.1.6.RELEASE</spring.version>
+        <hsqldb.version>2.3.2</hsqldb.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>javax.mail</groupId>
@@ -22,13 +27,26 @@
             <version>2.5.6</version>
         </dependency>
 
-        <!-- MySQL database driver -->
+        <!--&lt;!&ndash; MySQL database driver &ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>mysql</groupId>-->
+            <!--<artifactId>mysql-connector-java</artifactId>-->
+            <!--<version>5.1.9</version>-->
+        <!--</dependency>-->
+
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2 -->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.9</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-dbcp2</artifactId>
+            <version>2.0</version>
         </dependency>
 
+
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>${hsqldb.version}</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on -->
         <!--<dependency>-->
             <!--<groupId>org.bouncycastle</groupId>-->

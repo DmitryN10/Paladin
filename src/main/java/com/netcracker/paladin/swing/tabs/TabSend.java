@@ -3,6 +3,7 @@ package com.netcracker.paladin.swing.tabs;
 import com.netcracker.paladin.infrastructure.services.email.EmailService;
 import com.netcracker.paladin.infrastructure.services.encryption.EncryptionService;
 import com.netcracker.paladin.infrastructure.services.encryption.exceptions.NoPrivateKeyException;
+import com.netcracker.paladin.swing.exceptions.NoPublicKeyForEmailException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -98,6 +99,10 @@ public class TabSend extends JPanel {
             JOptionPane.showMessageDialog(this,
                     "Please, set your private key first",
                     "No private key", JOptionPane.ERROR_MESSAGE);
+        } catch (NoPublicKeyForEmailException npkfee){
+            JOptionPane.showMessageDialog(this,
+                    "No public key for this email found",
+                    "No public key", JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this,
                     "Error while sending the e-mail: " + e.getMessage(),

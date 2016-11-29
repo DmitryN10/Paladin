@@ -6,6 +6,7 @@ import com.netcracker.paladin.infrastructure.services.encryption.sessionkeygen.S
 import com.netcracker.paladin.infrastructure.services.encryption.symmetric.SymmetricEncryption;
 import com.netcracker.paladin.domain.PublicKeyEntry;
 import com.netcracker.paladin.infrastructure.repositories.PublicKeyEntryRepository;
+import com.netcracker.paladin.swing.exceptions.NoPublicKeyForEmailException;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -61,7 +62,9 @@ public class EncryptionServiceImpl implements EncryptionService {
             byte[] sessionKey = asymmetricEncryption.decrypt(encryptedSessionKey, privateKey);
             byte[] plainText = symmetricEncryption.decrypt(cipherText, sessionKey);
             return new String(plainText, "UTF-8");
-        }catch (Exception e){
+        } catch (NoPublicKeyForEmailException e){
+            throw e;
+        } catch (Exception e){
             e.printStackTrace();
             throw new IllegalStateException(e);
         }
@@ -92,6 +95,6 @@ public class EncryptionServiceImpl implements EncryptionService {
     }
 
     private byte[] findPublicKey(String email){
-        return publicKeyEntryRepository.findByEmail(email).getOwnPublicKey();
+        return publicKeyEntryRepository.findByEmail(email).getPublicKey();
     }
 }

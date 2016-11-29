@@ -4,8 +4,8 @@ package com.netcracker.paladin.domain;
  * Created by ivan on 27.11.16.
  */
 public class PublicKeyEntry {
-    private String email;
-    private byte[] publicKey;
+    private final String email;
+    private final byte[] publicKey;
 
     public PublicKeyEntry(String email, byte[] publicKey) {
         this.email = email;
@@ -16,15 +16,7 @@ public class PublicKeyEntry {
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public byte[] getOwnPublicKey() {
+    public byte[] getPublicKey() {
         return publicKey;
-    }
-
-    public void setPublicKey(byte[] publicKey) {
-        this.publicKey = publicKey;
     }
 }

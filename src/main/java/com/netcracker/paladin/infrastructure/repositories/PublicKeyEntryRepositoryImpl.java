@@ -1,80 +1,66 @@
 package com.netcracker.paladin.infrastructure.repositories;
 
 import com.netcracker.paladin.domain.PublicKeyEntry;
+import com.netcracker.paladin.swing.exceptions.NoPublicKeyForEmailException;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by ivan on 27.11.16.
  */
 public class PublicKeyEntryRepositoryImpl implements PublicKeyEntryRepository{
 
-    private final DataSource dataSource;
+    NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public PublicKeyEntryRepositoryImpl(DataSource dataSource) {
-        this.dataSource = dataSource;
+    public PublicKeyEntryRepositoryImpl(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
-    public void insert(PublicKeyEntry PublicKeyEntry){
+    public void insert(PublicKeyEntry publicKeyEntry) {
+        String sql = "INSERT INTO PUBLICKEYS " + "(EMAIL, PUBLICKEY) VALUES (:email, :publickey)";
 
-        String sql = "INSERT INTO PUBLICKEYS " + "(EMAIL, PUBLICKEY) VALUES (?, ?)";
-        Connection conn = null;
+        Map namedParameters = new HashMap();
+        namedParameters.put("email", publicKeyEntry.getEmail());
+        namedParameters.put("publickey", publicKeyEntry.getPublicKey());
 
-        try {
-            conn = dataSource.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, PublicKeyEntry.getEmail());
-            ps.setBytes(2, PublicKeyEntry.getOwnPublicKey());
-            ps.executeUpdate();
-            ps.close();
+        namedParameterJdbcTemplate.update(sql, namedParameters);
+    }
 
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException e) {}
-            }
+    public PublicKeyEntry findByEmail(String email) {
+
+        Map<String, Object> namedParameters = new HashMap<String, Object>();
+        namedParameters.put("email", email);
+
+        String sql = "SELECT * FROM PUBLICKEYS WHERE EMAIL = :email";
+
+        List<PublicKeyEntry> result = namedParameterJdbcTemplate.query(
+                sql,
+                namedParameters,
+                new PublicKeyEntryMapper());
+
+        switch (result.size()){
+            case 0:
+                throw new NoPublicKeyForEmailException();
+            case 1:
+                return result.get(0);
+            default:
+                throw new IllegalStateException("Multiple public keys for one email!");
         }
     }
 
-    public PublicKeyEntry findByEmail(String email){
+    private static final class PublicKeyEntryMapper implements RowMapper<PublicKeyEntry> {
 
-        String sql = "SELECT * FROM PUBLICKEYS WHERE EMAIL = ?";
-
-        Connection conn = null;
-
-        try {
-            conn = dataSource.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, email);
-            PublicKeyEntry PublicKeyEntry = null;
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                PublicKeyEntry = new PublicKeyEntry(
-                    rs.getString("EMAIL"),
-                    rs.getBytes("PUBLICKEY")
-                );
-            }
-            rs.close();
-            ps.close();
-            return PublicKeyEntry;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e){
-            e.printStackTrace();
-            throw new IllegalStateException();
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException e) {}
-            }
+        public PublicKeyEntry mapRow(ResultSet rs, int rowNum) throws SQLException {
+            String email = rs.getString("EMAIL");
+            byte[] publicKey = rs.getBytes("PUBLICKEY");
+            PublicKeyEntry publicKeyEntry = new PublicKeyEntry(email, publicKey);
+            return publicKeyEntry;
         }
     }
 }
