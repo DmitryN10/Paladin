@@ -79,8 +79,8 @@ public class EmailService {
 
                 messageEntry.setFrom(message.getFrom()[0].toString());
                 messageEntry.setSubject(message.getSubject());
-                messageEntry.setText(getText(message));
-                messageEntryList.add(messageEntry);
+                messageEntry.setMessage(getText(message));
+                messageEntry.setSentDate(message.getSentDate());
 
                 String contentType = message.getContentType();
                 if (contentType.contains("multipart")) {
@@ -95,6 +95,8 @@ public class EmailService {
                         }
                     }
                 }
+
+                messageEntryList.add(messageEntry);
             }
             
             return messageEntryList;

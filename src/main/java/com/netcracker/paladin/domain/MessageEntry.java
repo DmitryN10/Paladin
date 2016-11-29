@@ -1,5 +1,7 @@
 package com.netcracker.paladin.domain;
 
+import java.util.Date;
+
 /**
  * Created by ivan on 26.11.16.
  */
@@ -7,7 +9,8 @@ public class MessageEntry {
 
     private String from;
     private String subject;
-    private String text;
+    private String message;
+    private Date sentDate;
     private byte[] cipherBlob;
 
     public String getFrom() {
@@ -26,12 +29,20 @@ public class MessageEntry {
         this.subject = subject;
     }
 
-    public String getText() {
-        return text;
+    public String getMessage() {
+        return message;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public Date getSentDate() {
+        return sentDate;
+    }
+
+    public void setSentDate(Date sentDate) {
+        this.sentDate = sentDate;
     }
 
     public byte[] getCipherBlob() {

@@ -1,15 +1,13 @@
 package com.netcracker.paladin.swing.tabs;
 
+import com.netcracker.paladin.infrastructure.services.email.EmailService;
 import com.netcracker.paladin.infrastructure.services.encryption.EncryptionService;
 import com.netcracker.paladin.infrastructure.services.encryption.exceptions.NoPrivateKeyException;
-import com.netcracker.paladin.domain.MessageEntry;
-import com.netcracker.paladin.infrastructure.services.email.EmailService;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 
 /**
  * Created by ivan on 29.11.16.
@@ -91,19 +89,8 @@ public class TabSend extends JPanel {
             System.out.println("Sending...");
             emailService.sendEmail(toAddress,
                     subject,
-//                                    encryptionService.decryptEmail(encryptionService.encryptEmail(message, toAddress)),
                     "Message is encrypted",
                     encryptionService.encryptEmail(message, toAddress));
-
-            System.out.println("Reading...");
-            List<MessageEntry> allMessageEntries = emailService.readEmails();
-            MessageEntry entry = allMessageEntries.get(allMessageEntries.size()-1);
-            System.out.println("From: "+entry.getFrom());
-            System.out.println("Subject: "+entry.getSubject());
-            System.out.println("Text: "+entry.getText());
-            if(entry.getCipherBlob() != null){
-                System.out.println("Encrypted message: "+encryptionService.decryptEmail(entry.getCipherBlob()));
-            }
 
             JOptionPane.showMessageDialog(this,
                     "The e-mail has been sent successfully!");
