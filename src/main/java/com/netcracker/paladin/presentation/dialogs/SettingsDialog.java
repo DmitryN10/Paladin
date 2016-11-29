@@ -1,4 +1,4 @@
-package com.netcracker.paladin.presentation;
+package com.netcracker.paladin.presentation.dialogs;
 
 import com.netcracker.paladin.infrastructure.ConfigUtility;
 

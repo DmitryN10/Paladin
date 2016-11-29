@@ -7,8 +7,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.security.KeyPair;
-
 import static org.junit.Assert.fail;
 
 //@RunWith(value = Parameterized.class)
@@ -53,10 +51,9 @@ public class RsaTest {
     @Test
     public void fullCycle() throws Exception {
         byte[] sessionKey = sessionKeygen.generateKey().getEncoded();
-//        byte[] sessionKey = (new String("Pasha molodec")).getBytes("UTF-8");
-        KeyPair keyPair = asymmetricEncryption.generateKeyPair();
-        byte[] encryptedSessionKey = asymmetricEncryption.encrypt(sessionKey, keyPair.getPublic());
-        byte[] decryptedSessionKey = asymmetricEncryption.decrypt(encryptedSessionKey, keyPair.getPrivate());
+        byte[] privateKey = asymmetricEncryption.generatePrivateKey();
+        byte[] encryptedSessionKey = asymmetricEncryption.encrypt(sessionKey, asymmetricEncryption.generatePublicKey(privateKey));
+        byte[] decryptedSessionKey = asymmetricEncryption.decrypt(encryptedSessionKey, privateKey);
 
         if(sessionKey.length != decryptedSessionKey.length){
             fail();

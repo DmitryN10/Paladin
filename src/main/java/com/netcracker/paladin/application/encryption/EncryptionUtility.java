@@ -1,7 +1,5 @@
 package com.netcracker.paladin.application.encryption;
 
-import java.security.KeyPair;
-
 /**
  * Created by ivan on 27.11.16.
  */
@@ -10,5 +8,9 @@ public interface EncryptionUtility {
 
     String decryptEmail(byte[] cipherTextAndSessionKey);
 
-    KeyPair getKeyPair();
+    byte[] generatePrivateKey();
+
+    void setPrivateKey(byte[] privateKey);
+
+    byte[] getPublicKey();
 }

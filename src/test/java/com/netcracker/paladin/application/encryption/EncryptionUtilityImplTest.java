@@ -30,6 +30,7 @@ public class EncryptionUtilityImplTest {
 
     public EncryptionUtilityImplTest(String oldPlainText) {
         this.oldPlainText = oldPlainText;
+        encryptionUtility.generatePrivateKey();
     }
 
     @Parameterized.Parameters

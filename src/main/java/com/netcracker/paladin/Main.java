@@ -1,5 +1,6 @@
-package com.netcracker.paladin.presentation;
+package com.netcracker.paladin;
 
+import com.netcracker.paladin.presentation.SwingPaladinEmail;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -8,7 +9,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class Main {
     public static void main(String[] args) {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring-config.xml");
-        SwingEmailSender swingEmailSender = context.getBean(SwingEmailSender.class);
+        SwingPaladinEmail swingEmailSender = context.getBean(SwingPaladinEmail.class);
         swingEmailSender.launch();
     }
 }

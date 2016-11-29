@@ -4,11 +4,12 @@ package com.netcracker.paladin.application.encryption.asymmetric;
  * Created by ivan on 27.11.16.
  */
 
+import sun.security.rsa.RSAPrivateCrtKeyImpl;
+
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.RSAPrivateCrtKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
@@ -32,9 +33,9 @@ public class Rsa implements AsymmetricEncryption {
     }
 
     @Override
-    public KeyPair generateKeyPair() {
+    public byte[] generatePrivateKey() {
         try {
-            return keyPairGenerator.generateKeyPair();
+            return keyPairGenerator.generateKeyPair().getPrivate().getEncoded();
         } catch (Exception e) {
             e.printStackTrace();
             throw new IllegalStateException(e);
@@ -42,17 +43,12 @@ public class Rsa implements AsymmetricEncryption {
     }
 
     @Override
-    public PublicKey generatePublicKey(PrivateKey privateKey){
-        if(privateKey instanceof RSAPrivateCrtKeySpec == false){
-            throw new IllegalStateException();
-        }
-        RSAPrivateCrtKeySpec rsaPrivateCrtKeySpec = (RSAPrivateCrtKeySpec) privateKey;
-        RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(
-                rsaPrivateCrtKeySpec.getModulus(),
-                rsaPrivateCrtKeySpec.getPublicExponent());
+    public byte[] generatePublicKey(byte[] privateKeyBytes){
         try {
-            KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM);
-            return keyFactory.generatePublic(publicKeySpec);
+            PrivateKey privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
+            RSAPrivateCrtKeyImpl rsaPrivateKey = (RSAPrivateCrtKeyImpl) privateKey;
+            PublicKey publicKey = keyFactory.generatePublic(new RSAPublicKeySpec(rsaPrivateKey.getModulus(), rsaPrivateKey.getPublicExponent()));
+            return publicKey.getEncoded();
         } catch (Exception e) {
             e.printStackTrace();
             throw new IllegalStateException(e);

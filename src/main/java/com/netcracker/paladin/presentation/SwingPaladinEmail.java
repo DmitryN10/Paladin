@@ -5,16 +5,22 @@ package com.netcracker.paladin.presentation;
  */
 
 import com.netcracker.paladin.application.encryption.EncryptionUtility;
+import com.netcracker.paladin.application.encryption.NoPrivateKeyException;
 import com.netcracker.paladin.domain.MessageEntry;
 import com.netcracker.paladin.infrastructure.ConfigUtility;
 import com.netcracker.paladin.infrastructure.mail.EmailUtility;
+import com.netcracker.paladin.presentation.dialogs.AddPublicKeyDialog;
+import com.netcracker.paladin.presentation.dialogs.SetPrivateKeyDialog;
+import com.netcracker.paladin.presentation.dialogs.SettingsDialog;
+import org.apache.commons.io.FileUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.util.List;
 
-public class SwingEmailSender implements ItemListener {
+public class SwingPaladinEmail implements ItemListener {
     JPanel cards;
     private final static String SENDPANEL = "Send an email";
     private final static String READPANEL = "Read emails";
@@ -39,8 +45,11 @@ public class SwingEmailSender implements ItemListener {
     JMenuBar menuBar = new JMenuBar();
     JMenu menuFile = new JMenu("File");
     JMenuItem menuItemSetting = new JMenuItem("Settings..");
+    JMenuItem menuItemSetPrivateKey = new JMenuItem("Set private key..");
+    JMenuItem menuItemExportPublicKey = new JMenuItem("Export public key..");
+    JMenuItem menuItemAddPublicKey = new JMenuItem("Add public key..");
 
-    public SwingEmailSender(ConfigUtility configUtility, EmailUtility emailUtility, EncryptionUtility encryptionUtility) {
+    public SwingPaladinEmail(ConfigUtility configUtility, EmailUtility emailUtility, EncryptionUtility encryptionUtility) {
         this.configUtility = configUtility;
         this.emailUtility = emailUtility;
         this.encryptionUtility = encryptionUtility;
@@ -106,7 +115,6 @@ public class SwingEmailSender implements ItemListener {
         constraints.fill = GridBagConstraints.BOTH;
         buttonSend.setFont(new Font("Arial", Font.BOLD, 16));
         cardSend.add(buttonSend, constraints);
-
         buttonSend.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 buttonSendActionPerformed(event);
@@ -117,10 +125,6 @@ public class SwingEmailSender implements ItemListener {
         constraints.gridy = 2;
         constraints.gridheight = 1;
         constraints.gridwidth = 3;
-//        filePicker.setMode(JFilePicker.MODE_OPEN);
-//        add(filePicker, constraints);
-
-        constraints.gridy = 3;
         constraints.weightx = 1.0;
         constraints.weighty = 1.0;
 
@@ -132,8 +136,8 @@ public class SwingEmailSender implements ItemListener {
     private JPanel createCardRead(){
         JPanel cardRead = new JPanel();
 
-        JLabel labelFrom = new JLabel("To: ");
-        JLabel labelSubject = new JLabel("From: ");
+        JLabel labelFrom = new JLabel("From: ");
+        JLabel labelSubject = new JLabel("Subject: ");
         GridBagConstraints constraints = new GridBagConstraints();
 
         cardRead.setLayout(new GridBagLayout());
@@ -160,21 +164,8 @@ public class SwingEmailSender implements ItemListener {
         constraints.gridy = 0;
         constraints.gridheight = 2;
         constraints.fill = GridBagConstraints.BOTH;
-        buttonSend.setFont(new Font("Arial", Font.BOLD, 16));
+        buttonRefresh.setFont(new Font("Arial", Font.BOLD, 16));
         cardRead.add(buttonRefresh, constraints);
-
-        buttonSend.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                buttonSendActionPerformed(event);
-            }
-        });
-
-        constraints.gridx = 0;
-        constraints.gridy = 2;
-        constraints.gridheight = 1;
-        constraints.gridwidth = 3;
-//        filePicker.setMode(JFilePicker.MODE_OPEN);
-//        add(filePicker, constraints);
 
         constraints.gridy = 3;
         constraints.weightx = 1.0;
@@ -192,6 +183,43 @@ public class SwingEmailSender implements ItemListener {
             }
         });
         menuFile.add(menuItemSetting);
+
+        menuItemSetPrivateKey.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                SetPrivateKeyDialog dialog = new SetPrivateKeyDialog(frame, encryptionUtility);
+                dialog.setVisible(true);
+            }
+        });
+        menuFile.add(menuItemSetPrivateKey);
+
+        menuItemExportPublicKey.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    String username = configUtility.loadProperties().getProperty("mail.user");
+                    FileUtils.writeByteArrayToFile(new File(username+"_publicKey"), encryptionUtility.getPublicKey());
+
+                    JOptionPane.showMessageDialog(frame, "Public key was exported successfully!");
+                } catch (NoPrivateKeyException npke) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Please, set your private key first",
+                            "No private key", JOptionPane.ERROR_MESSAGE);
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Error saving properties file: " + e.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        menuFile.add(menuItemExportPublicKey);
+
+        menuItemAddPublicKey.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                AddPublicKeyDialog dialog = new AddPublicKeyDialog(frame, encryptionUtility);
+                dialog.setVisible(true);
+            }
+        });
+        menuFile.add(menuItemAddPublicKey);
+
         menuBar.add(menuFile);
         frame.setJMenuBar(menuBar);
     }
@@ -202,7 +230,7 @@ public class SwingEmailSender implements ItemListener {
 
         setupMenu();
 
-        SwingEmailSender swingEmailSender = new SwingEmailSender(configUtility, emailUtility, encryptionUtility);
+        SwingPaladinEmail swingEmailSender = new SwingPaladinEmail(configUtility, emailUtility, encryptionUtility);
         swingEmailSender.addComponentToPane(frame.getContentPane());
 
         frame.pack();
@@ -250,10 +278,13 @@ public class SwingEmailSender implements ItemListener {
 
             JOptionPane.showMessageDialog(frame,
                     "The e-mail has been sent successfully!");
-
-        } catch (Exception ex) {
+        } catch (NoPrivateKeyException npke){
             JOptionPane.showMessageDialog(frame,
-                    "Error while sending the e-mail: " + ex.getMessage(),
+                    "Please, set your private key first",
+                    "No private key", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(frame,
+                    "Error while sending the e-mail: " + e.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }

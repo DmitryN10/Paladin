@@ -1,4 +1,4 @@
-package com.netcracker.paladin.presentation;
+package com.netcracker.paladin.presentation.auxillary;
 
 
 import javax.swing.filechooser.FileFilter;

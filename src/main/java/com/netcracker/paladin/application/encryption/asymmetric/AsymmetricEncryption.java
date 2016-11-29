@@ -1,6 +1,5 @@
 package com.netcracker.paladin.application.encryption.asymmetric;
 
-import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
@@ -8,9 +7,9 @@ import java.security.PublicKey;
  * Created by ivan on 27.11.16.
  */
 public interface AsymmetricEncryption {
-    KeyPair generateKeyPair();
+    byte[] generatePrivateKey();
 
-    PublicKey generatePublicKey(PrivateKey privateKey);
+    byte[] generatePublicKey(byte[] privateKeyBytes);
 
     byte[] encrypt(byte[] sequenceToEncrypt, PublicKey publicKey);
 

@@ -1,4 +1,4 @@
-package com.netcracker.paladin.presentation;
+package com.netcracker.paladin.presentation.auxillary;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,9 +15,9 @@ public class JFilePicker extends JPanel {
 
     private JFileChooser fileChooser;
 
-    private int mode;
     public static final int MODE_OPEN = 1;
     public static final int MODE_SAVE = 2;
+    private int mode;
 
     public JFilePicker(String textFieldLabel, String buttonLabel) {
         this.textFieldLabel = textFieldLabel;

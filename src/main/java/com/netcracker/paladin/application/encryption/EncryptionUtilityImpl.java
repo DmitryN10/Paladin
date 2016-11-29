@@ -8,7 +8,6 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.security.Key;
-import java.security.KeyPair;
 
 /**
  * Created by ivan on 27.11.16.
@@ -19,7 +18,7 @@ public class EncryptionUtilityImpl implements EncryptionUtility {
     private final SymmetricEncryption symmetricEncryption;
     private final SessionKeygen sessionKeygen;
 
-    private KeyPair keyPair;
+    private byte[] privateKey;
 
     public EncryptionUtilityImpl(
             PublicKeyEntryRepository publicKeyEntryRepository,
@@ -30,15 +29,17 @@ public class EncryptionUtilityImpl implements EncryptionUtility {
         this.asymmetricEncryption = asymmetricEncryption;
         this.symmetricEncryption = symmetricEncryption;
         this.sessionKeygen = sessionKeygen;
-        this.keyPair = asymmetricEncryption.generateKeyPair();
     }
 
     @Override
     public byte[] encryptEmail(String plainText, String recipient){
+        if(privateKey == null){
+            throw new NoPrivateKeyException();
+        }
         try {
             Key sessionKey = sessionKeygen.generateKey();
             byte[] cipherText = symmetricEncryption.encrypt(plainText.getBytes("UTF-8"), sessionKey.getEncoded());
-            byte[] encryptedSessionKey = asymmetricEncryption.encrypt(sessionKey.getEncoded(), getKeyPair().getPublic().getEncoded());
+            byte[] encryptedSessionKey = asymmetricEncryption.encrypt(sessionKey.getEncoded(), getPublicKey());
 //            System.out.println("Text: "+cipherText.length);
 //            System.out.println("Key: "+encryptedSessionKey.length);
             return ArrayUtils.addAll(encryptedSessionKey, cipherText);
@@ -50,11 +51,14 @@ public class EncryptionUtilityImpl implements EncryptionUtility {
 
     @Override
     public String decryptEmail(byte[] cipherTextAndEncryptedSessionKey){
+        if(privateKey == null){
+            throw new NoPrivateKeyException();
+        }
         try {
             byte[] encryptedSessionKey = ArrayUtils.subarray(cipherTextAndEncryptedSessionKey, 0, 128);
             byte[] cipherText = ArrayUtils.subarray(cipherTextAndEncryptedSessionKey, 128, cipherTextAndEncryptedSessionKey.length);
 
-            byte[] sessionKey = asymmetricEncryption.decrypt(encryptedSessionKey, getKeyPair().getPrivate().getEncoded());
+            byte[] sessionKey = asymmetricEncryption.decrypt(encryptedSessionKey, privateKey);
             byte[] plainText = symmetricEncryption.decrypt(cipherText, sessionKey);
             return new String(plainText, "UTF-8");
         }catch (Exception e){
@@ -63,12 +67,22 @@ public class EncryptionUtilityImpl implements EncryptionUtility {
         }
     }
 
-//    public PublicKey generatePublicKey(){
-//        return asymmetricEncryption.generatePublicKey();
-//    }
+    @Override
+    public byte[] generatePrivateKey(){
+        this.privateKey = asymmetricEncryption.generatePrivateKey();
+        return privateKey;
+    }
 
     @Override
-    public KeyPair getKeyPair(){
-        return keyPair;
+    public void setPrivateKey(byte[] privateKey){
+        this.privateKey = privateKey;
+    }
+
+    @Override
+    public byte[] getPublicKey(){
+        if(privateKey == null){
+            throw new NoPrivateKeyException();
+        }
+        return asymmetricEncryption.generatePublicKey(privateKey);
     }
 }

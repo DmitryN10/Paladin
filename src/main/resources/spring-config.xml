@@ -38,7 +38,7 @@
         <constructor-arg name="sessionKeygen" ref="sessionKeygen"/>
     </bean>
 
-    <bean id="swingEmailSender" class="com.netcracker.paladin.presentation.SwingEmailSender">
+    <bean id="swingEmailSender" class="com.netcracker.paladin.presentation.SwingPaladinEmail">
         <constructor-arg name="configUtility" ref="configUtility"/>
         <constructor-arg name="emailUtility" ref="emailUtility"/>
         <constructor-arg name="encryptionUtility" ref="encryptionUtility"/>
