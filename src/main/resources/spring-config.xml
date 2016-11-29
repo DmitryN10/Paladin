@@ -15,33 +15,33 @@
         <constructor-arg name="dataSource" ref="dataSource"/>
     </bean>
 
-    <bean id="asymmetricEncryption" class="com.netcracker.paladin.application.encryption.asymmetric.Rsa">
+    <bean id="asymmetricEncryption" class="com.netcracker.paladin.infrastructure.services.encryption.asymmetric.Rsa">
     </bean>
 
-    <bean id="symmetricEncryption" class="com.netcracker.paladin.application.encryption.symmetric.Aes">
+    <bean id="symmetricEncryption" class="com.netcracker.paladin.infrastructure.services.encryption.symmetric.Aes">
     </bean>
 
-    <bean id="sessionKeygen" class="com.netcracker.paladin.application.encryption.sessionkeygen.ChebiKeygen">
+    <bean id="sessionKeygen" class="com.netcracker.paladin.infrastructure.services.encryption.sessionkeygen.ChebiKeygen">
     </bean>
 
-    <bean id="configUtility" class="com.netcracker.paladin.infrastructure.ConfigUtility">
+    <bean id="configService" class="com.netcracker.paladin.infrastructure.services.config.ConfigService">
     </bean>
 
-    <bean id="emailUtility" class="com.netcracker.paladin.infrastructure.mail.EmailUtility">
-        <constructor-arg name="configUtility" ref="configUtility"/>
+    <bean id="emailService" class="com.netcracker.paladin.infrastructure.services.email.EmailService">
+        <constructor-arg name="configService" ref="configService"/>
     </bean>
 
-    <bean id="encryptionUtility" class="com.netcracker.paladin.application.encryption.EncryptionUtilityImpl">
+    <bean id="encryptionService" class="com.netcracker.paladin.infrastructure.services.encryption.EncryptionServiceImpl">
         <constructor-arg name="publicKeyEntryRepository" ref="publicKeyEntryRepository"/>
         <constructor-arg name="asymmetricEncryption" ref="asymmetricEncryption"/>
         <constructor-arg name="symmetricEncryption" ref="symmetricEncryption"/>
         <constructor-arg name="sessionKeygen" ref="sessionKeygen"/>
     </bean>
 
-    <bean id="swingEmailSender" class="com.netcracker.paladin.presentation.SwingPaladinEmail">
-        <constructor-arg name="configUtility" ref="configUtility"/>
-        <constructor-arg name="emailUtility" ref="emailUtility"/>
-        <constructor-arg name="encryptionUtility" ref="encryptionUtility"/>
+    <bean id="swingEmailSender" class="com.netcracker.paladin.swing.SwingPaladinEmail">
+        <constructor-arg name="configService" ref="configService"/>
+        <constructor-arg name="emailService" ref="emailService"/>
+        <constructor-arg name="encryptionService" ref="encryptionService"/>
     </bean>
 
     <bean id="dataSource"

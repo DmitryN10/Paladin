@@ -1,6 +1,6 @@
 package com.netcracker.paladin;
 
-import com.netcracker.paladin.presentation.SwingPaladinEmail;
+import com.netcracker.paladin.swing.SwingPaladinEmail;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
