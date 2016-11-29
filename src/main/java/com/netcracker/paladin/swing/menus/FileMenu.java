@@ -22,16 +22,18 @@ public class FileMenu extends JMenu {
     private final EmailService emailService;
     private final EncryptionService encryptionService;
 
-    JMenuItem menuItemSetting = new JMenuItem("Settings..");
-    JMenuItem menuItemSetPrivateKey = new JMenuItem("Set private key..");
-    JMenuItem menuItemExportPublicKey = new JMenuItem("Export public key..");
-    JMenuItem menuItemAddPublicKey = new JMenuItem("Add public key..");
+//    private final JFrame frame;
+    private final JMenuItem menuItemSetting = new JMenuItem("Settings..");
+    private final JMenuItem menuItemSetPrivateKey = new JMenuItem("Set private key..");
+    private final JMenuItem menuItemExportPublicKey = new JMenuItem("Export public key..");
+    private final JMenuItem menuItemAddPublicKey = new JMenuItem("Add public key..");
 
-    public FileMenu(JFrame frame, ConfigService configService, EmailService emailService, EncryptionService encryptionService) {
+    public FileMenu(final JFrame frame, final ConfigService configService, final EmailService emailService, final EncryptionService encryptionService) {
         super("File");
         this.configService = configService;
         this.emailService = emailService;
         this.encryptionService = encryptionService;
+//        this.frame = frame;
 
         menuItemSetting.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {

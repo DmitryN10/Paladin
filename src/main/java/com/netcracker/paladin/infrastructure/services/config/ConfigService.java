@@ -2,10 +2,8 @@ package com.netcracker.paladin.infrastructure.services.config;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Properties;
 
 public class ConfigService {
@@ -42,8 +40,8 @@ public class ConfigService {
         configProps.setProperty("mail.smtp.starttls.enable", "true");
         configProps.setProperty("mail.smtp.auth", "true");
 
-        OutputStream outputStream = new FileOutputStream(configFile);
-        configProps.store(outputStream, "host setttings");
-        outputStream.close();
+//        OutputStream outputStream = new FileOutputStream(configFile);
+//        configProps.store(outputStream, "host setttings");
+//        outputStream.close();
     }
 }

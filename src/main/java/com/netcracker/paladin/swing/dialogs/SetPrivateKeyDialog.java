@@ -99,7 +99,9 @@ public class SetPrivateKeyDialog extends JDialog {
 
     private void buttonGenerateActionPerformed(ActionEvent event) {
         try {
-            FileUtils.writeByteArrayToFile(new File("privateKey"), encryptionService.generatePrivateKey());
+//            FileUtils.writeByteArrayToFile(new File("privateKey"), encryptionService.generatePrivateKey());
+
+            encryptionService.generatePrivateKey();
 
             JOptionPane.showMessageDialog(SetPrivateKeyDialog.this,
                     "Key was generated successfully!");
