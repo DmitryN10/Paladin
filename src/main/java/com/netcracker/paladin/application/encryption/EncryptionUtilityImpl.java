@@ -3,6 +3,7 @@ package com.netcracker.paladin.application.encryption;
 import com.netcracker.paladin.application.encryption.asymmetric.AsymmetricEncryption;
 import com.netcracker.paladin.application.encryption.sessionkeygen.SessionKeygen;
 import com.netcracker.paladin.application.encryption.symmetric.SymmetricEncryption;
+import com.netcracker.paladin.domain.PublicKeyEntry;
 import com.netcracker.paladin.infrastructure.repositories.PublicKeyEntryRepository;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -39,9 +40,7 @@ public class EncryptionUtilityImpl implements EncryptionUtility {
         try {
             Key sessionKey = sessionKeygen.generateKey();
             byte[] cipherText = symmetricEncryption.encrypt(plainText.getBytes("UTF-8"), sessionKey.getEncoded());
-            byte[] encryptedSessionKey = asymmetricEncryption.encrypt(sessionKey.getEncoded(), getPublicKey());
-//            System.out.println("Text: "+cipherText.length);
-//            System.out.println("Key: "+encryptedSessionKey.length);
+            byte[] encryptedSessionKey = asymmetricEncryption.encrypt(sessionKey.getEncoded(), findPublicKey(recipient));
             return ArrayUtils.addAll(encryptedSessionKey, cipherText);
         }catch (UnsupportedEncodingException e){
             e.printStackTrace();
@@ -79,10 +78,19 @@ public class EncryptionUtilityImpl implements EncryptionUtility {
     }
 
     @Override
-    public byte[] getPublicKey(){
+    public byte[] getOwnPublicKey(){
         if(privateKey == null){
             throw new NoPrivateKeyException();
         }
         return asymmetricEncryption.generatePublicKey(privateKey);
+    }
+
+    @Override
+    public void addPublicKey(String email, byte[] publicKey){
+        publicKeyEntryRepository.insert(new PublicKeyEntry(email, publicKey));
+    }
+
+    private byte[] findPublicKey(String email){
+        return publicKeyEntryRepository.findByEmail(email).getOwnPublicKey();
     }
 }

@@ -3,9 +3,6 @@ package com.netcracker.paladin.infrastructure.repositories;
 import com.netcracker.paladin.domain.PublicKeyEntry;
 
 import javax.sql.DataSource;
-import java.security.KeyFactory;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.X509EncodedKeySpec;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,13 +28,12 @@ public class PublicKeyEntryRepositoryImpl implements PublicKeyEntryRepository{
             conn = dataSource.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, PublicKeyEntry.getEmail());
-            ps.setString(2, PublicKeyEntry.getPublicKey().toString());
+            ps.setBytes(2, PublicKeyEntry.getOwnPublicKey());
             ps.executeUpdate();
             ps.close();
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
-
         } finally {
             if (conn != null) {
                 try {
@@ -60,14 +56,9 @@ public class PublicKeyEntryRepositoryImpl implements PublicKeyEntryRepository{
             PublicKeyEntry PublicKeyEntry = null;
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                KeyFactory rsaKeyFac =  KeyFactory.getInstance("RSA");
-                X509EncodedKeySpec keySpec = new X509EncodedKeySpec(rs.getString(1).getBytes());
-                RSAPublicKey pubKey;
-                pubKey = (RSAPublicKey) rsaKeyFac.generatePublic(keySpec);
-
                 PublicKeyEntry = new PublicKeyEntry(
                     rs.getString("EMAIL"),
-                    pubKey
+                    rs.getBytes("PUBLICKEY")
                 );
             }
             rs.close();

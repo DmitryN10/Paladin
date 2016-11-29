@@ -11,6 +11,6 @@ public class Backdoor {
     public static void main(String[] args) {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring-config.xml");
         PublicKeyEntryRepository repository = context.getBean(PublicKeyEntryRepositoryImpl.class);
-        System.out.println(repository.findByEmail("azanoviv02@gmail.com").getPublicKey());
+        System.out.println(repository.findByEmail("azanoviv02@gmail.com").getOwnPublicKey());
     }
 }

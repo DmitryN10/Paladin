@@ -2,11 +2,13 @@ package com.netcracker.paladin.presentation.dialogs;
 
 import com.netcracker.paladin.application.encryption.EncryptionUtility;
 import com.netcracker.paladin.presentation.auxillary.JFilePicker;
+import org.apache.commons.io.FileUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 public class AddPublicKeyDialog extends JDialog {
 
@@ -67,7 +69,14 @@ public class AddPublicKeyDialog extends JDialog {
             if (!validateFields()) {
                 return;
             }
-            
+
+            String publicKeyFilePath = filePicker.getSelectedFilePath();
+            byte[] publicKey = FileUtils.readFileToByteArray(new File(publicKeyFilePath));
+
+            String email = textEmail.getText();
+
+            encryptionUtility.addPublicKey(email, publicKey);
+
             JOptionPane.showMessageDialog(AddPublicKeyDialog.this,
                     "New public key was added successfully!");
             dispose();

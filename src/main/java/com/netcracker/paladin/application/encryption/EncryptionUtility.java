@@ -12,5 +12,7 @@ public interface EncryptionUtility {
 
     void setPrivateKey(byte[] privateKey);
 
-    byte[] getPublicKey();
+    byte[] getOwnPublicKey();
+
+    void addPublicKey(String email, byte[] publicKey);
 }

@@ -56,19 +56,6 @@ public class SwingPaladinEmail implements ItemListener {
     }
 
     public void addComponentToPane(Container pane) {
-//        JPanel comboBoxPane = new JPanel();
-//        String comboBoxItems[] = {SENDPANEL, READPANEL};
-//        JComboBox cb = new JComboBox(comboBoxItems);
-//        cb.setEditable(false);
-//        cb.addItemListener(this);
-//        comboBoxPane.add(cb);
-//
-//        cards = new JPanel(new CardLayout());
-//        cards.add(createCardSend(), SENDPANEL);
-//        cards.add(createCardRead(), READPANEL);
-//
-//        pane.add(comboBoxPane, BorderLayout.PAGE_START);
-//        pane.add(cards, BorderLayout.CENTER);
         JTabbedPane tabbedPane = new JTabbedPane();
 
         tabbedPane.addTab("Send", createCardSend());
@@ -196,7 +183,7 @@ public class SwingPaladinEmail implements ItemListener {
             public void actionPerformed(ActionEvent event) {
                 try {
                     String username = configUtility.loadProperties().getProperty("mail.user");
-                    FileUtils.writeByteArrayToFile(new File(username+"_publicKey"), encryptionUtility.getPublicKey());
+                    FileUtils.writeByteArrayToFile(new File(username+"_publicKey"), encryptionUtility.getOwnPublicKey());
 
                     JOptionPane.showMessageDialog(frame, "Public key was exported successfully!");
                 } catch (NoPrivateKeyException npke) {

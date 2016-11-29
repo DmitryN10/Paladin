@@ -1,15 +1,13 @@
 package com.netcracker.paladin.domain;
 
-import java.security.PublicKey;
-
 /**
  * Created by ivan on 27.11.16.
  */
 public class PublicKeyEntry {
     private String email;
-    private PublicKey publicKey;
+    private byte[] publicKey;
 
-    public PublicKeyEntry(String email, PublicKey publicKey) {
+    public PublicKeyEntry(String email, byte[] publicKey) {
         this.email = email;
         this.publicKey = publicKey;
     }
@@ -22,11 +20,11 @@ public class PublicKeyEntry {
         this.email = email;
     }
 
-    public PublicKey getPublicKey() {
+    public byte[] getOwnPublicKey() {
         return publicKey;
     }
 
-    public void setPublicKey(PublicKey publicKey) {
+    public void setPublicKey(byte[] publicKey) {
         this.publicKey = publicKey;
     }
 }
