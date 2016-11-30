@@ -34,7 +34,7 @@ public class SettingsDialog extends JDialog {
         loadSettings();
 
         pack();
-        setLocationRelativeTo(null);
+        setLocationRelativeTo(parent);
     }
 
     private void setupForm() {

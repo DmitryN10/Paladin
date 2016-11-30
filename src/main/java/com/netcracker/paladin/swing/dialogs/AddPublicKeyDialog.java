@@ -28,7 +28,7 @@ public class AddPublicKeyDialog extends JDialog {
         setupForm();
 
         pack();
-        setLocationRelativeTo(null);
+        setLocationRelativeTo(parent);
     }
 
     private void setupForm() {

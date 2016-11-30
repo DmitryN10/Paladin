@@ -7,6 +7,7 @@ package com.netcracker.paladin.swing;
 import com.netcracker.paladin.infrastructure.services.config.ConfigService;
 import com.netcracker.paladin.infrastructure.services.email.EmailService;
 import com.netcracker.paladin.infrastructure.services.encryption.EncryptionService;
+import com.netcracker.paladin.swing.dialogs.StartDialog;
 import com.netcracker.paladin.swing.menus.FileMenu;
 import com.netcracker.paladin.swing.tabs.TabRead;
 import com.netcracker.paladin.swing.tabs.TabSend;
@@ -57,7 +58,11 @@ public class SwingPaladinEmail {
         frame.setJMenuBar(jMenuBar);
 
         frame.pack();
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+
+        StartDialog startDialog = new StartDialog(frame, encryptionService);
+        startDialog.setVisible(true);
     }
 
     public void launch() {

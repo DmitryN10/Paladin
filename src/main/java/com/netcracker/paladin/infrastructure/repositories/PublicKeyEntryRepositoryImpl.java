@@ -54,6 +54,21 @@ public class PublicKeyEntryRepositoryImpl implements PublicKeyEntryRepository{
         }
     }
 
+    @Override
+    public List<PublicKeyEntry> findAll() {
+
+        Map<String, Object> namedParameters = new HashMap<String, Object>();
+
+        String sql = "SELECT * FROM PUBLICKEYS";
+
+        List<PublicKeyEntry> result = namedParameterJdbcTemplate.query(
+                sql,
+                namedParameters,
+                new PublicKeyEntryMapper());
+
+        return result;
+    }
+
     private static final class PublicKeyEntryMapper implements RowMapper<PublicKeyEntry> {
 
         public PublicKeyEntry mapRow(ResultSet rs, int rowNum) throws SQLException {

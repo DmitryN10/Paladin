@@ -33,7 +33,7 @@ public class SetPrivateKeyDialog extends JDialog {
         setupForm();
 
         pack();
-        setLocationRelativeTo(null);
+        setLocationRelativeTo(parent);
     }
 
     private void setupForm() {
@@ -88,12 +88,12 @@ public class SetPrivateKeyDialog extends JDialog {
             byte[] privateKey = FileUtils.readFileToByteArray(privateKeyFile);
             encryptionService.setPrivateKey(privateKey);
 
-            JOptionPane.showMessageDialog(SetPrivateKeyDialog.this, "Key was loaded successfully!");
+            JOptionPane.showMessageDialog(SetPrivateKeyDialog.this, "Private key was loaded successfully!");
             dispose();
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this,
-                    "Error saving properties file: " + e.getMessage(),
+                    "Error loading private key: " + e.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
