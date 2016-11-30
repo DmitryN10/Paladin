@@ -1,7 +1,7 @@
 package com.netcracker.paladin.infrastructure.repositories;
 
 import com.netcracker.paladin.domain.PublicKeyEntry;
-import com.netcracker.paladin.swing.exceptions.NoPublicKeyForEmailException;
+import com.netcracker.paladin.infrastructure.repositories.exceptions.NoPublicKeyForEmailException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public class PublicKeyEntryRepositoryImpl implements PublicKeyEntryRepository{
 
-    NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     public PublicKeyEntryRepositoryImpl(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;

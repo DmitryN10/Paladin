@@ -1,4 +1,4 @@
-package com.netcracker.paladin.swing.exceptions;
+package com.netcracker.paladin.infrastructure.repositories.exceptions;
 
 /**
  * Created by ivan on 29.11.16.

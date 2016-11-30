@@ -3,7 +3,7 @@ package com.netcracker.paladin.swing.tabs;
 import com.netcracker.paladin.infrastructure.services.email.EmailService;
 import com.netcracker.paladin.infrastructure.services.encryption.EncryptionService;
 import com.netcracker.paladin.infrastructure.services.encryption.exceptions.NoPrivateKeyException;
-import com.netcracker.paladin.swing.exceptions.NoPublicKeyForEmailException;
+import com.netcracker.paladin.infrastructure.repositories.exceptions.NoPublicKeyForEmailException;
 
 import javax.swing.*;
 import java.awt.*;

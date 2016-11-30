@@ -1,6 +1,7 @@
 package com.netcracker.paladin.swing.dialogs;
 
 import com.netcracker.paladin.infrastructure.services.encryption.EncryptionService;
+import com.netcracker.paladin.swing.exceptions.NoFileSelectedException;
 import org.apache.commons.io.FileUtils;
 
 import javax.swing.*;
@@ -99,17 +100,34 @@ public class SetPrivateKeyDialog extends JDialog {
 
     private void buttonGenerateActionPerformed(ActionEvent event) {
         try {
-//            FileUtils.writeByteArrayToFile(new File("privateKey"), encryptionService.generatePrivateKey());
+            File selectedFile = showSaveFileDialog();
 
-            encryptionService.generatePrivateKey();
+            byte[] privateKey = encryptionService.generatePrivateKey();
+            FileUtils.writeByteArrayToFile(selectedFile, privateKey);
 
             JOptionPane.showMessageDialog(SetPrivateKeyDialog.this,
                     "Key was generated successfully!");
             dispose();
+        } catch (NoFileSelectedException nfse){
+            JOptionPane.showMessageDialog(this,
+                    "No file was selected. Key was not generated.",
+                    "No file selected", JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this,
                     "Error saving properties file: " + e.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private File showSaveFileDialog() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Specify a file to save private key");
+
+        int userSelection = fileChooser.showSaveDialog(this);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            return fileChooser.getSelectedFile();
+        }else{
+            throw new NoFileSelectedException();
         }
     }
 }

@@ -62,6 +62,10 @@
         <constructor-arg name="namedParameterJdbcTemplate" ref="jdbcTemplate" />
     </bean>
 
+    <bean id="configRepository" class="com.netcracker.paladin.infrastructure.repositories.ConfigRepositoryImpl">
+        <constructor-arg name="namedParameterJdbcTemplate" ref="jdbcTemplate" />
+    </bean>
+
     <bean id="asymmetricEncryption" class="com.netcracker.paladin.infrastructure.services.encryption.asymmetric.Rsa">
     </bean>
 
@@ -72,6 +76,7 @@
     </bean>
 
     <bean id="configService" class="com.netcracker.paladin.infrastructure.services.config.ConfigService">
+        <constructor-arg name="configRepository" ref="configRepository"/>
     </bean>
 
     <bean id="emailService" class="com.netcracker.paladin.infrastructure.services.email.EmailService">

@@ -6,7 +6,7 @@ import com.netcracker.paladin.infrastructure.services.encryption.sessionkeygen.S
 import com.netcracker.paladin.infrastructure.services.encryption.symmetric.SymmetricEncryption;
 import com.netcracker.paladin.domain.PublicKeyEntry;
 import com.netcracker.paladin.infrastructure.repositories.PublicKeyEntryRepository;
-import com.netcracker.paladin.swing.exceptions.NoPublicKeyForEmailException;
+import com.netcracker.paladin.infrastructure.repositories.exceptions.NoPublicKeyForEmailException;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.UnsupportedEncodingException;
