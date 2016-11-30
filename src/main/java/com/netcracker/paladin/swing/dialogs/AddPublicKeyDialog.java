@@ -1,7 +1,7 @@
 package com.netcracker.paladin.swing.dialogs;
 
 import com.netcracker.paladin.infrastructure.services.encryption.EncryptionService;
-import com.netcracker.paladin.swing.auxillary.JFilePicker;
+import com.netcracker.paladin.swing.auxillary.FilePicker;
 import org.apache.commons.io.FileUtils;
 
 import javax.swing.*;
@@ -17,7 +17,7 @@ public class AddPublicKeyDialog extends JDialog {
     private JLabel labelEmail = new JLabel("Email: ");
     private JTextField textEmail = new JTextField(20);
 
-    private JFilePicker filePicker = new JFilePicker("Public key file", "Select");
+    private FilePicker filePicker = new FilePicker("Public key file", "Select");
 
     private JButton buttonAdd = new JButton("Add");
 
@@ -48,7 +48,7 @@ public class AddPublicKeyDialog extends JDialog {
         constraints.gridy = 1;
         constraints.gridheight = 1;
         constraints.gridwidth = 3;
-        filePicker.setMode(JFilePicker.MODE_OPEN);
+        filePicker.setMode(FilePicker.MODE_OPEN);
         add(filePicker, constraints);
 
         constraints.gridx = 0;

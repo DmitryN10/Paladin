@@ -1,23 +1,27 @@
 package com.netcracker.paladin.swing.tabs;
 
+import com.netcracker.paladin.infrastructure.repositories.exceptions.NoPublicKeyForEmailException;
 import com.netcracker.paladin.infrastructure.services.email.EmailService;
 import com.netcracker.paladin.infrastructure.services.encryption.EncryptionService;
 import com.netcracker.paladin.infrastructure.services.encryption.exceptions.NoPrivateKeyException;
-import com.netcracker.paladin.infrastructure.repositories.exceptions.NoPublicKeyForEmailException;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 /**
  * Created by ivan on 29.11.16.
  */
 public class TabSend extends JPanel {
+    private final JFrame parent;
     private final EmailService emailService;
     private final EncryptionService encryptionService;
 
-    private final JTextField fieldTo = new JTextField(30);
+//    private final JTextField fieldTo = new JTextField(30);
+    private JComboBox comboBoxTo;
+
     private final JTextField fieldSubject = new JTextField(30);
     private final JButton buttonSend = new JButton("SEND");
     private final JTextArea textAreaMessage = new JTextArea(10, 30);
@@ -25,7 +29,9 @@ public class TabSend extends JPanel {
     private final JLabel labelSubject = new JLabel("Subject: ");
     private final GridBagConstraints constraints = new GridBagConstraints();
 
-    public TabSend(EmailService emailService, EncryptionService encryptionService) {
+    public TabSend(JFrame parent, EmailService emailService, EncryptionService encryptionService) {
+        this.parent = parent;
+
         this.emailService = emailService;
         this.encryptionService = encryptionService;
 
@@ -39,7 +45,9 @@ public class TabSend extends JPanel {
 
         constraints.gridx = 1;
         constraints.fill = GridBagConstraints.HORIZONTAL;
-        add(fieldTo, constraints);
+        updateEmailsWithPublicKeyList();
+//        add(fieldTo, constraints);
+        add(comboBoxTo, constraints);
 
         constraints.gridx = 0;
         constraints.gridy = 1;
@@ -76,7 +84,8 @@ public class TabSend extends JPanel {
             return;
         }
 
-        String toAddress = fieldTo.getText();
+//        String toAddress = fieldTo.getText();
+        String toAddress = (String) comboBoxTo.getSelectedItem();
         String subject = fieldSubject.getText();
         String message = textAreaMessage.getText();
 
@@ -111,13 +120,13 @@ public class TabSend extends JPanel {
     }
 
     private boolean validateFields() {
-        if (fieldTo.getText().equals("")) {
-            JOptionPane.showMessageDialog(this,
-                    "Please enter To address!",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            fieldTo.requestFocus();
-            return false;
-        }
+//        if (fieldTo.getText().equals("")) {
+//            JOptionPane.showMessageDialog(this,
+//                    "Please enter To address!",
+//                    "Error", JOptionPane.ERROR_MESSAGE);
+//            fieldTo.requestFocus();
+//            return false;
+//        }
 
         if (fieldSubject.getText().equals("")) {
             JOptionPane.showMessageDialog(this,
@@ -136,5 +145,16 @@ public class TabSend extends JPanel {
         }
 
         return true;
+    }
+
+    public void updateEmailsWithPublicKeyList(){
+        List<String> allEmailsWithPublicKeyList = encryptionService.getAllEmailsWithPublicKey();
+        if(allEmailsWithPublicKeyList.isEmpty()){
+            allEmailsWithPublicKeyList.add("No public keys");
+            buttonSend.setEnabled(false);
+        }else{
+            buttonSend.setEnabled(true);
+        }
+        comboBoxTo = new JComboBox(allEmailsWithPublicKeyList.toArray());
     }
 }

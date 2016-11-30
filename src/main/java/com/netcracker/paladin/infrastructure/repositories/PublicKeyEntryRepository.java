@@ -12,5 +12,7 @@ public interface PublicKeyEntryRepository {
 
     public PublicKeyEntry findByEmail(String email);
 
+    void deleteByEmail(String email);
+
     List<PublicKeyEntry> findAll();
 }

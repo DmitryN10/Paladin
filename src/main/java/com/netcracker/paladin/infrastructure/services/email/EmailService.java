@@ -39,6 +39,7 @@ public class EmailService {
             MultiPartEmail email = new MultiPartEmail();
             email.setHostName(hostname);
             email.setSmtpPort(Integer.parseInt(port));
+            System.out.println(Integer.parseInt(port));
             email.setAuthenticator(new DefaultAuthenticator(username, password));
             email.setSSLOnConnect(true);
             email.setFrom(username);

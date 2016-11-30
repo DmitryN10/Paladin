@@ -55,6 +55,14 @@ public class PublicKeyEntryRepositoryImpl implements PublicKeyEntryRepository{
     }
 
     @Override
+    public void deleteByEmail(String email) {
+        String SQL = "DELETE FROM PUBLICKEYS WHERE EMAIL = :email";
+        Map<String, Object> namedParameters = new HashMap<String, Object>();
+        namedParameters.put("email", email);
+        namedParameterJdbcTemplate.update(SQL, namedParameters);
+    }
+
+    @Override
     public List<PublicKeyEntry> findAll() {
 
         Map<String, Object> namedParameters = new HashMap<String, Object>();

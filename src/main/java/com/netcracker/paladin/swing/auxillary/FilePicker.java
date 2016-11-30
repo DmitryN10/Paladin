@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class JFilePicker extends JPanel {
+public class FilePicker extends JPanel {
     private String textFieldLabel;
     private String buttonLabel;
 
@@ -19,7 +19,7 @@ public class JFilePicker extends JPanel {
     public static final int MODE_SAVE = 2;
     private int mode;
 
-    public JFilePicker(String textFieldLabel, String buttonLabel) {
+    public FilePicker(String textFieldLabel, String buttonLabel) {
         this.textFieldLabel = textFieldLabel;
         this.buttonLabel = buttonLabel;
 

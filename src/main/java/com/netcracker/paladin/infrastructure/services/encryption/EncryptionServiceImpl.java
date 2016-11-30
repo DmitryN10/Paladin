@@ -1,16 +1,18 @@
 package com.netcracker.paladin.infrastructure.services.encryption;
 
+import com.netcracker.paladin.domain.PublicKeyEntry;
+import com.netcracker.paladin.infrastructure.repositories.PublicKeyEntryRepository;
+import com.netcracker.paladin.infrastructure.repositories.exceptions.NoPublicKeyForEmailException;
 import com.netcracker.paladin.infrastructure.services.encryption.asymmetric.AsymmetricEncryption;
 import com.netcracker.paladin.infrastructure.services.encryption.exceptions.NoPrivateKeyException;
 import com.netcracker.paladin.infrastructure.services.encryption.sessionkeygen.SessionKeygen;
 import com.netcracker.paladin.infrastructure.services.encryption.symmetric.SymmetricEncryption;
-import com.netcracker.paladin.domain.PublicKeyEntry;
-import com.netcracker.paladin.infrastructure.repositories.PublicKeyEntryRepository;
-import com.netcracker.paladin.infrastructure.repositories.exceptions.NoPublicKeyForEmailException;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.security.Key;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by ivan on 27.11.16.
@@ -92,6 +94,21 @@ public class EncryptionServiceImpl implements EncryptionService {
     @Override
     public void addPublicKey(String email, byte[] publicKey){
         publicKeyEntryRepository.insert(new PublicKeyEntry(email, publicKey));
+    }
+
+    @Override
+    public void deletePublicKey(String email){
+        publicKeyEntryRepository.deleteByEmail(email);
+    }
+
+    @Override
+    public List<String> getAllEmailsWithPublicKey(){
+        List<PublicKeyEntry> allPublicKeyEntries = publicKeyEntryRepository.findAll();
+        List<String> allEmailsWithPublicKey = new ArrayList<>(allPublicKeyEntries.size());
+        for(PublicKeyEntry publicKeyEntry : allPublicKeyEntries){
+            allEmailsWithPublicKey.add(publicKeyEntry.getEmail());
+        }
+        return allEmailsWithPublicKey;
     }
 
     private byte[] findPublicKey(String email){
