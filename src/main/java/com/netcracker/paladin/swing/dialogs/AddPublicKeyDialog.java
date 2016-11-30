@@ -1,6 +1,7 @@
 package com.netcracker.paladin.swing.dialogs;
 
 import com.netcracker.paladin.infrastructure.services.encryption.EncryptionService;
+import com.netcracker.paladin.swing.SwingPaladinEmail;
 import com.netcracker.paladin.swing.auxillary.FilePicker;
 import org.apache.commons.io.FileUtils;
 
@@ -11,8 +12,12 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 public class AddPublicKeyDialog extends JDialog {
+    private JFrame parent;
 
     private EncryptionService encryptionService;
+
+    private DefaultComboBoxModel<String> comboBoxModelEmails;
+    private DefaultButtonModel buttonModelSend;
 
     private JLabel labelEmail = new JLabel("Email: ");
     private JTextField textEmail = new JTextField(20);
@@ -22,8 +27,12 @@ public class AddPublicKeyDialog extends JDialog {
     private JButton buttonAdd = new JButton("Add");
 
     public AddPublicKeyDialog(JFrame parent, EncryptionService encryptionService) {
-        super(parent, "SMTP Settings", true);
+        super(parent, "Adding new public key", true);
+        this.parent = parent;
         this.encryptionService = encryptionService;
+
+        this.comboBoxModelEmails = ((SwingPaladinEmail) parent).getComboBoxModelEmails();
+        this.buttonModelSend = ((SwingPaladinEmail) this.parent).getButtonModelSend();
 
         setupForm();
 
@@ -76,6 +85,12 @@ public class AddPublicKeyDialog extends JDialog {
             String email = textEmail.getText();
 
             encryptionService.addPublicKey(email, publicKey);
+
+            if(comboBoxModelEmails.getSize() == 1){
+                comboBoxModelEmails.removeElement(((SwingPaladinEmail) parent).getPlaceholderEmail());
+                buttonModelSend.setEnabled(true);
+            }
+            comboBoxModelEmails.addElement(email);
 
             JOptionPane.showMessageDialog(AddPublicKeyDialog.this,
                     "New public key was added successfully!");

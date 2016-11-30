@@ -23,19 +23,30 @@ public class SwingPaladinEmail extends JFrame {
     private final EmailService emailService;
     private final EncryptionService encryptionService;
 
+    private final DefaultComboBoxModel<String> comboBoxModelEmails;
+    private final String PLACEHOLDER_EMAIL = "No public keys";
+    private final DefaultButtonModel buttonModelSend;
+
     private final static String TABSEND = "Send an email";
     private final static String TABREAD = "Read emails";
 
     private final TabSend tabSend;
     private final TabRead tabRead;
 
-    private JFrame frame;
-
     public SwingPaladinEmail(ConfigService configService, EmailService emailService, EncryptionService encryptionService) {
         super("Paladin Email");
         this.configService = configService;
         this.emailService = emailService;
         this.encryptionService = encryptionService;
+
+        comboBoxModelEmails = new DefaultComboBoxModel(this.encryptionService.getAllEmailsWithPublicKey().toArray());
+        buttonModelSend = new DefaultButtonModel();
+        if(comboBoxModelEmails.getSize() == 0){
+            comboBoxModelEmails.addElement(getPlaceholderEmail());
+            buttonModelSend.setEnabled(false);
+        }else{
+            buttonModelSend.setEnabled(true);
+        }
 
         tabSend = new TabSend(this, emailService, encryptionService);
         tabRead = new TabRead(emailService, encryptionService);
@@ -58,8 +69,7 @@ public class SwingPaladinEmail extends JFrame {
     private void createAndShowGUI() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        SwingPaladinEmail swingEmailSender = new SwingPaladinEmail(configService, emailService, encryptionService);
-        swingEmailSender.addComponentToPane(this.getContentPane());
+        this.addComponentToPane(this.getContentPane());
 
         JMenuBar jMenuBar = new JMenuBar();
         jMenuBar.add(new FileMenu(this, configService, emailService, encryptionService));
@@ -89,11 +99,15 @@ public class SwingPaladinEmail extends JFrame {
         });
     }
 
-    public TabSend getTabSend() {
-        return tabSend;
+    public DefaultComboBoxModel<String> getComboBoxModelEmails() {
+        return comboBoxModelEmails;
     }
 
-    public TabRead getTabRead() {
-        return tabRead;
+    public String getPlaceholderEmail() {
+        return PLACEHOLDER_EMAIL;
+    }
+
+    public DefaultButtonModel getButtonModelSend() {
+        return buttonModelSend;
     }
 }

@@ -4,23 +4,26 @@ import com.netcracker.paladin.infrastructure.repositories.exceptions.NoPublicKey
 import com.netcracker.paladin.infrastructure.services.email.EmailService;
 import com.netcracker.paladin.infrastructure.services.encryption.EncryptionService;
 import com.netcracker.paladin.infrastructure.services.encryption.exceptions.NoPrivateKeyException;
+import com.netcracker.paladin.swing.SwingPaladinEmail;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 
 /**
  * Created by ivan on 29.11.16.
  */
 public class TabSend extends JPanel {
     private final JFrame parent;
+
     private final EmailService emailService;
     private final EncryptionService encryptionService;
 
 //    private final JTextField fieldTo = new JTextField(30);
     private JComboBox comboBoxTo;
+    private DefaultComboBoxModel comboBoxModelEmails;
+    private DefaultButtonModel buttonModelSend;
 
     private final JTextField fieldSubject = new JTextField(30);
     private final JButton buttonSend = new JButton("SEND");
@@ -35,6 +38,9 @@ public class TabSend extends JPanel {
         this.emailService = emailService;
         this.encryptionService = encryptionService;
 
+        this.comboBoxModelEmails = ((SwingPaladinEmail) this.parent).getComboBoxModelEmails();
+        this.buttonModelSend = ((SwingPaladinEmail) this.parent).getButtonModelSend();
+
         setLayout(new GridBagLayout());
         constraints.anchor = GridBagConstraints.WEST;
         constraints.insets = new Insets(5, 5, 5, 5);
@@ -45,8 +51,9 @@ public class TabSend extends JPanel {
 
         constraints.gridx = 1;
         constraints.fill = GridBagConstraints.HORIZONTAL;
-        updateEmailsWithPublicKeyList();
 //        add(fieldTo, constraints);
+        comboBoxTo = new JComboBox();
+        comboBoxTo.setModel(comboBoxModelEmails);
         add(comboBoxTo, constraints);
 
         constraints.gridx = 0;
@@ -61,6 +68,7 @@ public class TabSend extends JPanel {
         constraints.gridy = 0;
         constraints.gridheight = 2;
         constraints.fill = GridBagConstraints.BOTH;
+        buttonSend.setModel(buttonModelSend);
         buttonSend.setFont(new Font("Arial", Font.BOLD, 16));
         add(buttonSend, constraints);
         buttonSend.addActionListener(new ActionListener() {
@@ -145,16 +153,5 @@ public class TabSend extends JPanel {
         }
 
         return true;
-    }
-
-    public void updateEmailsWithPublicKeyList(){
-        List<String> allEmailsWithPublicKeyList = encryptionService.getAllEmailsWithPublicKey();
-        if(allEmailsWithPublicKeyList.isEmpty()){
-            allEmailsWithPublicKeyList.add("No public keys");
-            buttonSend.setEnabled(false);
-        }else{
-            buttonSend.setEnabled(true);
-        }
-        comboBoxTo = new JComboBox(allEmailsWithPublicKeyList.toArray());
     }
 }

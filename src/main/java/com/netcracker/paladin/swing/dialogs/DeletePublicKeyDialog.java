@@ -10,10 +10,12 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 public class DeletePublicKeyDialog extends JDialog {
+    private JFrame parent;
 
     private EncryptionService encryptionService;
 
-    public JFrame parent;
+    private DefaultComboBoxModel<String> comboBoxModelEmails;
+    private DefaultButtonModel buttonModelSend;
 
     private JLabel labelEmail = new JLabel("Email: ");
     private JComboBox comboBoxDelete;
@@ -22,8 +24,11 @@ public class DeletePublicKeyDialog extends JDialog {
 
     public DeletePublicKeyDialog(JFrame parent, EncryptionService encryptionService) {
         super(parent, "SMTP Settings", true);
-        this.encryptionService = encryptionService;
         this.parent = parent;
+        this.encryptionService = encryptionService;
+
+        this.comboBoxModelEmails = ((SwingPaladinEmail) parent).getComboBoxModelEmails();
+        this.buttonModelSend = ((SwingPaladinEmail) this.parent).getButtonModelSend();
 
         setupForm();
 
@@ -43,7 +48,7 @@ public class DeletePublicKeyDialog extends JDialog {
 
         constraints.gridx = 0;
         constraints.gridy = 1;
-        updateEmailsWithPublicKeyList();
+        comboBoxDelete = new JComboBox(comboBoxModelEmails);
         add(comboBoxDelete);
 
         constraints.gridx = 0;
@@ -64,8 +69,13 @@ public class DeletePublicKeyDialog extends JDialog {
             String email = (String) comboBoxDelete.getSelectedItem();
             encryptionService.deletePublicKey(email);
 
+            comboBoxModelEmails.removeElement(email);
+            if(comboBoxModelEmails.getSize() == 0){
+                comboBoxModelEmails.addElement(((SwingPaladinEmail) parent).getPlaceholderEmail());
+                buttonModelSend.setEnabled(false);
+            }
+
             updateEmailsWithPublicKeyList();
-            ((SwingPaladinEmail) parent).getTabSend().updateEmailsWithPublicKeyList();
 
             JOptionPane.showMessageDialog(DeletePublicKeyDialog.this,
                     "Public key was deleted successfully!");
@@ -85,6 +95,5 @@ public class DeletePublicKeyDialog extends JDialog {
         }else{
             buttonDelete.setEnabled(true);
         }
-        comboBoxDelete = new JComboBox(allEmailsWithPublicKeyList.toArray());
     }
 }
