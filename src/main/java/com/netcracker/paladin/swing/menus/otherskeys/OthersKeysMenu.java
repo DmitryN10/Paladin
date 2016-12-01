@@ -1,10 +1,8 @@
-package com.netcracker.paladin.swing.menus;
+package com.netcracker.paladin.swing.menus.otherskeys;
 
 import com.netcracker.paladin.infrastructure.services.config.ConfigService;
 import com.netcracker.paladin.infrastructure.services.email.EmailService;
 import com.netcracker.paladin.infrastructure.services.encryption.EncryptionService;
-import com.netcracker.paladin.swing.dialogs.AddPublicKeyDialog;
-import com.netcracker.paladin.swing.dialogs.DeletePublicKeyDialog;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

@@ -1,4 +1,4 @@
-package com.netcracker.paladin.swing.dialogs;
+package com.netcracker.paladin.swing.menus.file;
 
 import com.netcracker.paladin.infrastructure.services.config.ConfigService;
 

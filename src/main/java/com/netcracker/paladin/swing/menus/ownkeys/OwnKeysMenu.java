@@ -1,10 +1,10 @@
-package com.netcracker.paladin.swing.menus;
+package com.netcracker.paladin.swing.menus.ownkeys;
 
 import com.netcracker.paladin.infrastructure.services.config.ConfigService;
 import com.netcracker.paladin.infrastructure.services.email.EmailService;
 import com.netcracker.paladin.infrastructure.services.encryption.EncryptionService;
 import com.netcracker.paladin.infrastructure.services.encryption.exceptions.NoPrivateKeyException;
-import com.netcracker.paladin.swing.dialogs.SetPrivateKeyDialog;
+import com.netcracker.paladin.swing.exceptions.NoFileSelectedException;
 import org.apache.commons.io.FileUtils;
 
 import javax.swing.*;
@@ -42,14 +42,20 @@ public class OwnKeysMenu extends JMenu {
         menuItemExportPublicKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 try {
+                    File selectedFile = showSaveFileDialog();
+
                     String username = configService.loadProperties().getProperty("mail.user");
-                    FileUtils.writeByteArrayToFile(new File(username+"_publicKey"), encryptionService.getOwnPublicKey());
+                    FileUtils.writeByteArrayToFile(selectedFile, encryptionService.getOwnPublicKey());
 
                     JOptionPane.showMessageDialog(frame, "Public key was exported successfully!");
                 } catch (NoPrivateKeyException npke) {
                     JOptionPane.showMessageDialog(frame,
                             "Please, set your private key first",
                             "No private key", JOptionPane.ERROR_MESSAGE);
+                } catch (NoFileSelectedException nfse){
+                    JOptionPane.showMessageDialog(frame,
+                            "No file was selected. Key was not generated.",
+                            "No file selected", JOptionPane.ERROR_MESSAGE);
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(frame,
                             "Error saving properties file: " + e.getMessage(),
@@ -58,5 +64,17 @@ public class OwnKeysMenu extends JMenu {
             }
         });
         add(menuItemExportPublicKey);
+    }
+
+    private File showSaveFileDialog() throws NoFileSelectedException {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Specify a file to save public key");
+
+        int userSelection = fileChooser.showSaveDialog(this);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            return fileChooser.getSelectedFile();
+        }else{
+            throw new NoFileSelectedException();
+        }
     }
 }

@@ -9,6 +9,7 @@ import sun.security.rsa.RSAPrivateCrtKeyImpl;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import java.security.*;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -17,9 +18,11 @@ public class Rsa implements AsymmetricEncryption {
 
     private final String ALGORITHM = "RSA";
     private final int KEYSIZE = 1024;
+
     private final KeyFactory keyFactory;
     private final Cipher cipher;
     private final KeyPairGenerator keyPairGenerator;
+    private final Signature signature;
 
     public Rsa() {
         try {
@@ -27,6 +30,7 @@ public class Rsa implements AsymmetricEncryption {
             cipher = Cipher.getInstance(ALGORITHM);
             keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM);
             keyPairGenerator.initialize(KEYSIZE);
+            signature = Signature.getInstance("MD5WithRSA");
         }catch (NoSuchAlgorithmException | NoSuchPaddingException e){
             throw new IllegalStateException(e);
         }
@@ -68,12 +72,7 @@ public class Rsa implements AsymmetricEncryption {
 
     @Override
     public byte[] encrypt(byte[] sequenceToEncrypt, byte[] publicKeyBytes) {
-        try {
-            return encrypt(sequenceToEncrypt, keyFactory.generatePublic(new X509EncodedKeySpec(publicKeyBytes)));
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new IllegalStateException(e);
-        }
+        return encrypt(sequenceToEncrypt, getPublicKeyFromBytes(publicKeyBytes));
     }
 
     @Override
@@ -89,10 +88,43 @@ public class Rsa implements AsymmetricEncryption {
 
     @Override
     public byte[] decrypt(byte[] sequenceToDecrypt, byte[] privateKeyBytes) {
+        return decrypt(sequenceToDecrypt, getPrivateKeyFromBytes(privateKeyBytes));
+    }
+
+    @Override
+    public byte[] createSignature(byte[] data, byte[] privateKeyBytes){
         try {
-            return decrypt(sequenceToDecrypt, keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes)));
-        } catch (Exception e) {
-            e.printStackTrace();
+            signature.initSign(getPrivateKeyFromBytes(privateKeyBytes));
+            signature.update(data);
+            return signature.sign();
+        }catch (InvalidKeyException | SignatureException e){
+            throw new IllegalStateException(e);
+        }
+    }
+
+    @Override
+    public boolean verifySignature(byte[] data, byte[] signatureBytes, byte[] publicKeyBytes){
+        try {
+            signature.initVerify(getPublicKeyFromBytes(publicKeyBytes));
+            signature.update(data);
+            return signature.verify(signatureBytes);
+        }catch (InvalidKeyException | SignatureException e){
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private PrivateKey getPrivateKeyFromBytes(byte[] privateKeyBytes){
+        try {
+            return keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
+        }catch (InvalidKeySpecException e){
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private PublicKey getPublicKeyFromBytes(byte[] publicKeyBytes){
+        try {
+            return keyFactory.generatePublic(new X509EncodedKeySpec(publicKeyBytes));
+        }catch (InvalidKeySpecException e){
             throw new IllegalStateException(e);
         }
     }

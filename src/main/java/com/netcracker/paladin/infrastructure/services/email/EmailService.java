@@ -1,6 +1,6 @@
 package com.netcracker.paladin.infrastructure.services.email;
 
-import com.netcracker.paladin.domain.EmailEntry;
+import com.netcracker.paladin.domain.MessageEntry;
 import com.netcracker.paladin.infrastructure.services.config.ConfigService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.mail.DefaultAuthenticator;
@@ -57,7 +57,7 @@ public class EmailService {
         }
     }
 
-    public List<EmailEntry> readEmails() {
+    public List<MessageEntry> readEmails() {
         try {
             Properties properties = configService.loadProperties();
             properties.setProperty("mail.store.protocol", "imaps");
@@ -73,11 +73,11 @@ public class EmailService {
             emailFolder.open(Folder.READ_ONLY);
 
             Message[] messages = emailFolder.getMessages();
-            List<EmailEntry> messageEntryList = new ArrayList<>(messages.length);
+            List<MessageEntry> messageEntryList = new ArrayList<>(messages.length);
             
             for(Message message : messages){
 
-                EmailEntry messageEntry = new EmailEntry();
+                MessageEntry messageEntry = new MessageEntry();
 
                 messageEntry.setFrom(message.getFrom()[0].toString());
                 messageEntry.setSubject(message.getSubject());

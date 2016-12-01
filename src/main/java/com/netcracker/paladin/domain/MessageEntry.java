@@ -6,7 +6,7 @@ import java.util.Date;
 /**
  * Created by ivan on 26.11.16.
  */
-public class EmailEntry implements Comparable {
+public class MessageEntry implements Comparable {
 
     private String from;
     private String subject;
@@ -68,18 +68,18 @@ public class EmailEntry implements Comparable {
         if(o == null){
             throw new NullPointerException();
         }
-        if(o instanceof EmailEntry == false){
+        if(o instanceof MessageEntry == false){
             throw new ClassCastException();
         }
-        return(this.getSentDate().compareTo(((EmailEntry) o).getSentDate()));
+        return(this.getSentDate().compareTo(((MessageEntry) o).getSentDate()));
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof EmailEntry)) return false;
+        if (!(o instanceof MessageEntry)) return false;
 
-        EmailEntry that = (EmailEntry) o;
+        MessageEntry that = (MessageEntry) o;
 
         if (!getFrom().equals(that.getFrom())) return false;
         if (getSubject() != null ? !getSubject().equals(that.getSubject()) : that.getSubject() != null) return false;

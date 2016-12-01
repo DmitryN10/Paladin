@@ -1,4 +1,4 @@
-package com.netcracker.paladin.swing.dialogs;
+package com.netcracker.paladin.swing.menus.ownkeys;
 
 import com.netcracker.paladin.infrastructure.services.encryption.EncryptionService;
 import com.netcracker.paladin.swing.exceptions.NoFileSelectedException;
@@ -119,7 +119,7 @@ public class SetPrivateKeyDialog extends JDialog {
         }
     }
 
-    private File showSaveFileDialog() {
+    private File showSaveFileDialog() throws NoFileSelectedException {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Specify a file to save private key");
 

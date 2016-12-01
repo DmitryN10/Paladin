@@ -1,6 +1,7 @@
 package com.netcracker.paladin.swing.dialogs;
 
 import com.netcracker.paladin.infrastructure.services.encryption.EncryptionService;
+import com.netcracker.paladin.swing.menus.ownkeys.SetPrivateKeyDialog;
 
 import javax.swing.*;
 import java.awt.event.WindowAdapter;

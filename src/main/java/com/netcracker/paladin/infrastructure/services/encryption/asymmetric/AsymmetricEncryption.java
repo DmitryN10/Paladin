@@ -18,4 +18,8 @@ public interface AsymmetricEncryption {
     byte[] decrypt(byte[] sequenceToDecrypt, PrivateKey privateKey);
 
     byte[] decrypt(byte[] sequenceToDecrypt, byte[] privateKeyBytes);
+
+    byte[] createSignature(byte[] data, byte[] privateKeyBytes);
+
+    boolean verifySignature(byte[] data, byte[] signatureBytes, byte[] publicKeyBytes);
 }

@@ -1,4 +1,4 @@
-package com.netcracker.paladin.swing.dialogs;
+package com.netcracker.paladin.swing.menus.otherskeys;
 
 import com.netcracker.paladin.infrastructure.services.encryption.EncryptionService;
 import com.netcracker.paladin.swing.SwingPaladinEmail;
@@ -11,7 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-public class AddPublicKeyDialog extends JDialog {
+public class SharePublicKeysDialog extends JDialog {
     private JFrame parent;
 
     private EncryptionService encryptionService;
@@ -24,9 +24,9 @@ public class AddPublicKeyDialog extends JDialog {
 
     private FilePicker filePicker = new FilePicker("Public key file", "Select");
 
-    private JButton buttonAdd = new JButton("Add");
+    private JButton buttonShare = new JButton("Add");
 
-    public AddPublicKeyDialog(JFrame parent, EncryptionService encryptionService) {
+    public SharePublicKeysDialog(JFrame parent, EncryptionService encryptionService) {
         super(parent, "Adding new public key", true);
         this.parent = parent;
         this.encryptionService = encryptionService;
@@ -64,16 +64,16 @@ public class AddPublicKeyDialog extends JDialog {
         constraints.gridy = 2;
         constraints.gridwidth = 2;
         constraints.anchor = GridBagConstraints.CENTER;
-        add(buttonAdd, constraints);
+        add(buttonShare, constraints);
 
-        buttonAdd.addActionListener(new ActionListener() {
+        buttonShare.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                buttonAddActionPerformed(event);
+                buttonShareActionPerformed(event);
             }
         });
     }
 
-    private void buttonAddActionPerformed(ActionEvent event) {
+    private void buttonShareActionPerformed(ActionEvent event) {
         try {
             if (!validateFields()) {
                 return;
@@ -92,7 +92,7 @@ public class AddPublicKeyDialog extends JDialog {
             }
             comboBoxModelEmails.addElement(email);
 
-            JOptionPane.showMessageDialog(AddPublicKeyDialog.this,
+            JOptionPane.showMessageDialog(SharePublicKeysDialog.this,
                     "New public key was added successfully!");
             dispose();
         } catch (Exception e) {

@@ -8,9 +8,9 @@ import com.netcracker.paladin.infrastructure.services.config.ConfigService;
 import com.netcracker.paladin.infrastructure.services.email.EmailService;
 import com.netcracker.paladin.infrastructure.services.encryption.EncryptionService;
 import com.netcracker.paladin.swing.dialogs.StartDialog;
-import com.netcracker.paladin.swing.menus.FileMenu;
-import com.netcracker.paladin.swing.menus.OthersKeysMenu;
-import com.netcracker.paladin.swing.menus.OwnKeysMenu;
+import com.netcracker.paladin.swing.menus.file.FileMenu;
+import com.netcracker.paladin.swing.menus.otherskeys.OthersKeysMenu;
+import com.netcracker.paladin.swing.menus.ownkeys.OwnKeysMenu;
 import com.netcracker.paladin.swing.tabs.TabRead;
 import com.netcracker.paladin.swing.tabs.TabSend;
 

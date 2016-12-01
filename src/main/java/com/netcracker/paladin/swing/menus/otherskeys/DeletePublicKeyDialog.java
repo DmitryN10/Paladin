@@ -1,4 +1,4 @@
-package com.netcracker.paladin.swing.dialogs;
+package com.netcracker.paladin.swing.menus.otherskeys;
 
 import com.netcracker.paladin.infrastructure.services.encryption.EncryptionService;
 import com.netcracker.paladin.swing.SwingPaladinEmail;

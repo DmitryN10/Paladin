@@ -3,7 +3,7 @@ package com.netcracker.paladin.swing.exceptions;
 /**
  * Created by ivan on 30.11.16.
  */
-public class NoFileSelectedException extends IllegalStateException {
+public class NoFileSelectedException extends Exception {
     public NoFileSelectedException() {
     }
 
@@ -17,5 +17,9 @@ public class NoFileSelectedException extends IllegalStateException {
 
     public NoFileSelectedException(Throwable cause) {
         super(cause);
+    }
+
+    public NoFileSelectedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

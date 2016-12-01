@@ -1,5 +1,7 @@
 package com.netcracker.paladin.infrastructure.services.encryption;
 
+import com.netcracker.paladin.domain.SignedPublicKeyEntry;
+
 import java.util.List;
 
 /**
@@ -21,4 +23,8 @@ public interface EncryptionService {
     void deletePublicKey(String email);
 
     List<String> getAllEmailsWithPublicKey();
+
+    SignedPublicKeyEntry getSignedPublicKeyEntry(String email);
+
+    boolean verifySignature(String email, byte[] signature, byte[] data);
 }

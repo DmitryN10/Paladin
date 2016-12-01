@@ -1,6 +1,6 @@
 package com.netcracker.paladin.swing.tabs;
 
-import com.netcracker.paladin.domain.EmailEntry;
+import com.netcracker.paladin.domain.MessageEntry;
 import com.netcracker.paladin.infrastructure.services.email.EmailService;
 import com.netcracker.paladin.infrastructure.services.encryption.EncryptionService;
 import com.netcracker.paladin.infrastructure.services.encryption.exceptions.NoPrivateKeyException;
@@ -21,7 +21,7 @@ public class TabRead extends JPanel {
     private final EmailService emailService;
     private final EncryptionService encryptionService;
 
-    private final List<EmailEntry> loadedEmailEntries;
+    private final List<MessageEntry> loadedEmailEntries;
     private int currentIndex;
 
     private static final int MIN_DATE_LENGTH = 40;
@@ -130,9 +130,9 @@ public class TabRead extends JPanel {
     private void buttonNewerActionPerformed(ActionEvent event) {
         try {
             if(currentIndex >= loadedEmailEntries.size()-1){
-                List<EmailEntry> newLoadedEmailEntries = emailService.readEmails();
+                List<MessageEntry> newLoadedEmailEntries = emailService.readEmails();
 
-                for(EmailEntry entry : newLoadedEmailEntries){
+                for(MessageEntry entry : newLoadedEmailEntries){
                     if(loadedEmailEntries.contains(entry) == false){
                         decryptEntry(entry);
                         loadedEmailEntries.add(entry);
@@ -197,7 +197,7 @@ public class TabRead extends JPanel {
         }
     }
 
-    private void decryptEntry(EmailEntry entry){
+    private void decryptEntry(MessageEntry entry){
         if(entry.getCipherBlob() != null){
             entry.setDisplayedMessage(encryptionService.decryptEmail(entry.getCipherBlob()));
         }else{
@@ -209,7 +209,7 @@ public class TabRead extends JPanel {
         }
     }
 
-    private void displayEntry(EmailEntry entry){
+    private void displayEntry(MessageEntry entry){
         labelValueFrom.setText(entry.getFrom());
         labelValueSubject.setText(entry.getSubject());
         labelValueDate.setText(StringUtils.rightPad(entry.getSentDate().toString(), MIN_DATE_LENGTH));

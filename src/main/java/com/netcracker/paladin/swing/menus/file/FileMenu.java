@@ -1,9 +1,8 @@
-package com.netcracker.paladin.swing.menus;
+package com.netcracker.paladin.swing.menus.file;
 
 import com.netcracker.paladin.infrastructure.services.config.ConfigService;
 import com.netcracker.paladin.infrastructure.services.email.EmailService;
 import com.netcracker.paladin.infrastructure.services.encryption.EncryptionService;
-import com.netcracker.paladin.swing.dialogs.SettingsDialog;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

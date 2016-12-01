@@ -1,6 +1,7 @@
 package com.netcracker.paladin.infrastructure.services.encryption;
 
 import com.netcracker.paladin.domain.PublicKeyEntry;
+import com.netcracker.paladin.domain.SignedPublicKeyEntry;
 import com.netcracker.paladin.infrastructure.repositories.PublicKeyEntryRepository;
 import com.netcracker.paladin.infrastructure.repositories.exceptions.NoPublicKeyForEmailException;
 import com.netcracker.paladin.infrastructure.services.encryption.asymmetric.AsymmetricEncryption;
@@ -108,6 +109,19 @@ public class EncryptionServiceImpl implements EncryptionService {
             allEmailsWithPublicKey.add(publicKeyEntry.getEmail());
         }
         return allEmailsWithPublicKey;
+    }
+
+    @Override
+    public SignedPublicKeyEntry getSignedPublicKeyEntry(String email){
+        byte[] publicKey = publicKeyEntryRepository.findByEmail(email).getPublicKey();
+        byte[] signature = asymmetricEncryption.createSignature(publicKey, privateKey);
+        return new SignedPublicKeyEntry(email, publicKey, signature);
+    }
+
+    @Override
+    public boolean verifySignature(String email, byte[] signature, byte[] data){
+        byte[] publicKey = publicKeyEntryRepository.findByEmail(email).getPublicKey();
+        return asymmetricEncryption.verifySignature(data, signature, publicKey);
     }
 
     private byte[] findPublicKey(String email){
