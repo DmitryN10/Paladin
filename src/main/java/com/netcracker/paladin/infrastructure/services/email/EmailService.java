@@ -1,6 +1,6 @@
 package com.netcracker.paladin.infrastructure.services.email;
 
-import com.netcracker.paladin.domain.MessageEntry;
+import com.netcracker.paladin.domain.EmailEntry;
 import com.netcracker.paladin.infrastructure.services.config.ConfigService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.mail.DefaultAuthenticator;
@@ -57,12 +57,13 @@ public class EmailService {
         }
     }
 
-    public List<MessageEntry> readEmails() {
+    public List<EmailEntry> readEmails() {
         try {
             Properties properties = configService.loadProperties();
-            Session emailSession = Session.getDefaultInstance(properties);
+            properties.setProperty("mail.store.protocol", "imaps");
 
-            Store store = emailSession.getStore("pop3s");
+            Session emailSession = Session.getDefaultInstance(properties);
+            Store store = emailSession.getStore("imaps");
             store.connect(
                     properties.getProperty("mail.smtp.host"),
                     properties.getProperty("mail.user"),
@@ -72,15 +73,15 @@ public class EmailService {
             emailFolder.open(Folder.READ_ONLY);
 
             Message[] messages = emailFolder.getMessages();
-            List<MessageEntry> messageEntryList = new ArrayList<>(messages.length);
+            List<EmailEntry> messageEntryList = new ArrayList<>(messages.length);
             
             for(Message message : messages){
 
-                MessageEntry messageEntry = new MessageEntry();
+                EmailEntry messageEntry = new EmailEntry();
 
                 messageEntry.setFrom(message.getFrom()[0].toString());
                 messageEntry.setSubject(message.getSubject());
-                messageEntry.setMessage(getText(message));
+                messageEntry.setPlainMessage(getText(message));
                 messageEntry.setSentDate(message.getSentDate());
 
                 String contentType = message.getContentType();

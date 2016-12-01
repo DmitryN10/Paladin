@@ -1,15 +1,17 @@
 package com.netcracker.paladin.swing.tabs;
 
-import com.netcracker.paladin.domain.MessageEntry;
+import com.netcracker.paladin.domain.EmailEntry;
 import com.netcracker.paladin.infrastructure.services.email.EmailService;
 import com.netcracker.paladin.infrastructure.services.encryption.EncryptionService;
 import com.netcracker.paladin.infrastructure.services.encryption.exceptions.NoPrivateKeyException;
 import com.netcracker.paladin.swing.exceptions.NoMessagesException;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,14 +21,28 @@ public class TabRead extends JPanel {
     private final EmailService emailService;
     private final EncryptionService encryptionService;
 
-    private final JLabel labelValueFrom = new JLabel("No email");
-    private final JLabel labelValueSubject = new JLabel("No subject");
-    private final JLabel labelValueDate = new JLabel("No date");
-    private final JButton buttonRefresh = new JButton("REFRESH");
-    private final JTextArea textAreaMessage = new JTextArea(10, 30);
+    private final List<EmailEntry> loadedEmailEntries;
+    private int currentIndex;
+
+    private static final int MIN_DATE_LENGTH = 40;
+
+    private final JLabel labelValueFrom = new JLabel();
+    private final JLabel labelValueSubject = new JLabel();
+    private final JLabel labelValueDate = new JLabel();
+    private final JLabel labelValueNumber = new JLabel();
+
     private final JLabel labelFrom = new JLabel("From: ");
     private final JLabel labelSubject = new JLabel("Subject: ");
     private final JLabel labelDate = new JLabel("Date: ");
+    private final JLabel labelNumber = new JLabel("Number: ");
+
+    private final JButton buttonNewer = new JButton("NEWER");
+    private final JButton buttonOlder = new JButton("OLDER");
+    private final DefaultButtonModel buttonModelNewer = new DefaultButtonModel();
+    private final DefaultButtonModel buttonModelOlder = new DefaultButtonModel();
+
+    private final JTextArea textAreaMessage = new JTextArea(10, 30);
+
     private final GridBagConstraints constraints = new GridBagConstraints();
 
     public TabRead(EmailService emailService, EncryptionService encryptionService) {
@@ -59,57 +75,89 @@ public class TabRead extends JPanel {
 
         constraints.gridx = 1;
         constraints.fill = GridBagConstraints.HORIZONTAL;
+        labelValueDate.setText(StringUtils.rightPad("", MIN_DATE_LENGTH));
         add(labelValueDate, constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 3;
+        add(labelNumber, constraints);
+
+        constraints.gridx = 1;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        add(labelValueNumber, constraints);
 
         constraints.gridx = 2;
         constraints.gridy = 0;
-        constraints.gridheight = 3;
+        constraints.gridheight = 2;
         constraints.fill = GridBagConstraints.BOTH;
-        buttonRefresh.setFont(new Font("Arial", Font.BOLD, 16));
-        add(buttonRefresh, constraints);
-        buttonRefresh.addActionListener(new ActionListener() {
+        buttonNewer.setModel(buttonModelNewer);
+        buttonNewer.setFont(new Font("Arial", Font.BOLD, 16));
+        add(buttonNewer, constraints);
+        buttonNewer.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                buttonRefreshActionPerformed(event);
+                buttonNewerActionPerformed(event);
+            }
+        });
+
+        constraints.gridx = 2;
+        constraints.gridy = 2;
+        constraints.gridheight = 2;
+        constraints.fill = GridBagConstraints.BOTH;
+        buttonOlder.setModel(buttonModelOlder);
+        buttonOlder.setFont(new Font("Arial", Font.BOLD, 16));
+        buttonOlder.setEnabled(false);
+        add(buttonOlder, constraints);
+        buttonOlder.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                buttonOlderActionPerformed(event);
             }
         });
 
         constraints.gridx = 0;
-        constraints.gridy = 3;
+        constraints.gridy = 4;
         constraints.gridheight = 1;
         constraints.gridwidth = 3;
         constraints.weightx = 1.0;
         constraints.weighty = 1.0;
 
         textAreaMessage.setEditable(false);
-        textAreaMessage.setText("No message");
         add(new JScrollPane(textAreaMessage), constraints);
+
+        loadedEmailEntries = new ArrayList<>();
+        currentIndex = -1;
     }
 
-    private void buttonRefreshActionPerformed(ActionEvent event) {
+    private void buttonNewerActionPerformed(ActionEvent event) {
         try {
-            System.out.println("Reading...");
-            List<MessageEntry> allMessageEntries = emailService.readEmails();
-            if(allMessageEntries.isEmpty()){
-                throw new NoMessagesException();
-            }
+            if(currentIndex >= loadedEmailEntries.size()-1){
+                List<EmailEntry> newLoadedEmailEntries = emailService.readEmails();
 
-            MessageEntry entry = allMessageEntries.get(allMessageEntries.size()-1);
+                for(EmailEntry entry : newLoadedEmailEntries){
+                    if(loadedEmailEntries.contains(entry) == false){
+                        decryptEntry(entry);
+                        loadedEmailEntries.add(entry);
+                    }
+                }
 
-            String from = entry.getFrom();
-            String subject = entry.getSubject();
-            String date = entry.getSentDate().toString();
-
-            String message = null;
-            if(entry.getCipherBlob() != null){
-                message = encryptionService.decryptEmail(entry.getCipherBlob());
+                if(currentIndex < loadedEmailEntries.size()-1){
+                    currentIndex++;
+                    displayEntry(loadedEmailEntries.get(currentIndex));
+                }else{
+                    JOptionPane.showMessageDialog(this,
+                            "No new emails :(",
+                            "No new emails", JOptionPane.INFORMATION_MESSAGE);
+                }
             }else{
-                message = entry.getMessage();
+                currentIndex++;
+                displayEntry(loadedEmailEntries.get(currentIndex));
             }
 
-            labelValueFrom.setText(from);
-            labelValueSubject.setText(subject);
-            labelValueDate.setText(date);
-            textAreaMessage.setText(message);
+            if(currentIndex > 0){
+                buttonModelOlder.setEnabled(true);
+            }
+//            else if(currentIndex == loadedEmailEntries.size()-1){
+//                buttonNewer.setBackground(new Color(255, 0, 0));
+//            }
         } catch (NoMessagesException nme){
             JOptionPane.showMessageDialog(this,
                     "Mailbox is empty :(",
@@ -123,5 +171,51 @@ public class TabRead extends JPanel {
                     "Error while reading e-mails: " + e.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void buttonOlderActionPerformed(ActionEvent event) {
+        try {
+            if(currentIndex != 0) {
+                currentIndex--;
+                displayEntry(loadedEmailEntries.get(currentIndex));
+            }
+            if(currentIndex == 0){
+                buttonModelOlder.setEnabled(false);
+            }
+        } catch (NoMessagesException nme){
+            JOptionPane.showMessageDialog(this,
+                    "Mailbox is empty :(",
+                    "No mail", JOptionPane.ERROR_MESSAGE);
+        } catch (NoPrivateKeyException npke){
+            JOptionPane.showMessageDialog(this,
+                    "Please, set your private key first",
+                    "No private key", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                    "Error while reading e-mails: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void decryptEntry(EmailEntry entry){
+        if(entry.getCipherBlob() != null){
+            entry.setDisplayedMessage(encryptionService.decryptEmail(entry.getCipherBlob()));
+        }else{
+            entry.setDisplayedMessage(entry.getPlainMessage());
+        }
+
+        if(entry.getDisplayedMessage() == null){
+            throw new Error("Improper email entry decryption!");
+        }
+    }
+
+    private void displayEntry(EmailEntry entry){
+        labelValueFrom.setText(entry.getFrom());
+        labelValueSubject.setText(entry.getSubject());
+        labelValueDate.setText(StringUtils.rightPad(entry.getSentDate().toString(), MIN_DATE_LENGTH));
+        labelValueNumber.setText((currentIndex+1)+" out of "+loadedEmailEntries.size());
+        textAreaMessage.setText(entry.getDisplayedMessage());
+        this.validate();
+        this.repaint();
     }
 }

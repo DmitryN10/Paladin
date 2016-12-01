@@ -1,7 +1,6 @@
 package com.netcracker.paladin.infrastructure.services.encryption.sessionkeygen;
 
 import javax.crypto.KeyGenerator;
-import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
@@ -22,7 +21,7 @@ public class ChebiKeygen implements SessionKeygen {
     }
 
     @Override
-    public Key generateKey(){
-        return keyGenerator.generateKey();
+    public byte[] generateKey(){
+        return keyGenerator.generateKey().getEncoded();
     }
 }

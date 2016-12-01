@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -56,9 +55,9 @@ public class AesTest {
 
     @Test
     public void fullCycle() throws Exception {
-        Key sessionKey = sessionKeygen.generateKey();
-        byte[] cipherText = symmetricEncryption.encrypt(oldPlainText.getBytes("UTF-8"), sessionKey.getEncoded());
-        String newPlainText = new String(symmetricEncryption.decrypt(cipherText, sessionKey.getEncoded()));
+        byte[] sessionKey = sessionKeygen.generateKey();
+        byte[] cipherText = symmetricEncryption.encrypt(oldPlainText.getBytes("UTF-8"), sessionKey);
+        String newPlainText = new String(symmetricEncryption.decrypt(cipherText, sessionKey));
         assertEquals(oldPlainText, newPlainText);
     }
 }

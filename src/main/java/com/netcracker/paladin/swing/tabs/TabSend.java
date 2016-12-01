@@ -21,15 +21,18 @@ public class TabSend extends JPanel {
     private final EncryptionService encryptionService;
 
 //    private final JTextField fieldTo = new JTextField(30);
-    private JComboBox comboBoxTo;
-    private DefaultComboBoxModel comboBoxModelEmails;
-    private DefaultButtonModel buttonModelSend;
 
-    private final JTextField fieldSubject = new JTextField(30);
-    private final JButton buttonSend = new JButton("SEND");
-    private final JTextArea textAreaMessage = new JTextArea(10, 30);
     private final JLabel labelTo = new JLabel("To: ");
     private final JLabel labelSubject = new JLabel("Subject: ");
+
+    private final JComboBox comboBoxTo;
+    private final JButton buttonSend = new JButton("SEND");
+    private final DefaultComboBoxModel comboBoxModelEmails;
+    private final DefaultButtonModel buttonModelSend;
+
+    private final JTextField fieldSubject = new JTextField(30);
+    private final JTextArea textAreaMessage = new JTextArea(10, 30);
+
     private final GridBagConstraints constraints = new GridBagConstraints();
 
     public TabSend(JFrame parent, EmailService emailService, EncryptionService encryptionService) {

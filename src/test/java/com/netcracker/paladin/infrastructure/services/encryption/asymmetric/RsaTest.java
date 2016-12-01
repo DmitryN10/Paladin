@@ -50,7 +50,7 @@ public class RsaTest {
 
     @Test
     public void fullCycle() throws Exception {
-        byte[] sessionKey = sessionKeygen.generateKey().getEncoded();
+        byte[] sessionKey = sessionKeygen.generateKey();
         byte[] privateKey = asymmetricEncryption.generatePrivateKey();
         byte[] encryptedSessionKey = asymmetricEncryption.encrypt(sessionKey, asymmetricEncryption.generatePublicKey(privateKey));
         byte[] decryptedSessionKey = asymmetricEncryption.decrypt(encryptedSessionKey, privateKey);

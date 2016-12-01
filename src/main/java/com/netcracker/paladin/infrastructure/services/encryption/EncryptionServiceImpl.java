@@ -10,7 +10,6 @@ import com.netcracker.paladin.infrastructure.services.encryption.symmetric.Symme
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.UnsupportedEncodingException;
-import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,9 +41,9 @@ public class EncryptionServiceImpl implements EncryptionService {
             throw new NoPrivateKeyException();
         }
         try {
-            Key sessionKey = sessionKeygen.generateKey();
-            byte[] cipherText = symmetricEncryption.encrypt(plainText.getBytes("UTF-8"), sessionKey.getEncoded());
-            byte[] encryptedSessionKey = asymmetricEncryption.encrypt(sessionKey.getEncoded(), findPublicKey(recipient));
+            byte[] sessionKey = sessionKeygen.generateKey();
+            byte[] cipherText = symmetricEncryption.encrypt(plainText.getBytes("UTF-8"), sessionKey);
+            byte[] encryptedSessionKey = asymmetricEncryption.encrypt(sessionKey, findPublicKey(recipient));
             return ArrayUtils.addAll(encryptedSessionKey, cipherText);
         }catch (UnsupportedEncodingException e){
             e.printStackTrace();
