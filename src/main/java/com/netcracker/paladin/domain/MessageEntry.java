@@ -14,6 +14,9 @@ public class MessageEntry implements Comparable {
     private Date sentDate;
     private String plainMessage;
     private byte[] cipherBlob;
+    private byte[] signature;
+
+    private String signatureStatus;
 
     public String getFrom() {
         return from;
@@ -61,6 +64,22 @@ public class MessageEntry implements Comparable {
 
     public void setCipherBlob(byte[] cipherBlob) {
         this.cipherBlob = cipherBlob;
+    }
+
+    public byte[] getSignature() {
+        return signature;
+    }
+
+    public void setSignature(byte[] signature) {
+        this.signature = signature;
+    }
+
+    public String getSignatureStatus() {
+        return signatureStatus;
+    }
+
+    public void setSignatureStatus(String signatureStatus) {
+        this.signatureStatus = signatureStatus;
     }
 
     @Override

@@ -110,4 +110,11 @@ public class SwingPaladinEmail extends JFrame {
     public DefaultButtonModel getButtonModelSend() {
         return buttonModelSend;
     }
+
+//    public void AddEmailToModel(String email){
+//        if(comboBoxModelEmails.getSize() == 1){
+//            comboBoxModelEmails.removeElement(getPlaceholderEmail());
+//            buttonModelSend.setEnabled(true);
+//        }
+//    }
 }

@@ -79,7 +79,7 @@
         <constructor-arg name="configRepository" ref="configRepository"/>
     </bean>
 
-    <bean id="emailService" class="com.netcracker.paladin.infrastructure.services.email.EmailService">
+    <bean id="emailService" class="com.netcracker.paladin.infrastructure.services.email.EmailServiceImpl">
         <constructor-arg name="configService" ref="configService"/>
     </bean>
 

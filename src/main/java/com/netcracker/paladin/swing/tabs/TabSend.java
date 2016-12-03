@@ -108,10 +108,12 @@ public class TabSend extends JPanel {
 
         try {
             System.out.println("Sending...");
+            byte[] cipherBlob = encryptionService.encryptEmail(message, toAddress);
             emailService.sendEmail(toAddress,
                     subject,
                     "Message is encrypted",
-                    encryptionService.encryptEmail(message, toAddress));
+                    cipherBlob,
+                    encryptionService.getSignature(cipherBlob));
 
             JOptionPane.showMessageDialog(this,
                     "The e-mail has been sent successfully!");

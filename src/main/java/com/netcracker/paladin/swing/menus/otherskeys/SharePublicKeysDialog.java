@@ -1,38 +1,42 @@
 package com.netcracker.paladin.swing.menus.otherskeys;
 
+import com.netcracker.paladin.domain.PublicKeyEntry;
+import com.netcracker.paladin.domain.SignedPublicKeyEntry;
+import com.netcracker.paladin.infrastructure.services.email.EmailService;
 import com.netcracker.paladin.infrastructure.services.encryption.EncryptionService;
-import com.netcracker.paladin.swing.SwingPaladinEmail;
-import com.netcracker.paladin.swing.auxillary.FilePicker;
-import org.apache.commons.io.FileUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SharePublicKeysDialog extends JDialog {
-    private JFrame parent;
+    private final JFrame parent;
 
-    private EncryptionService encryptionService;
+    private final EmailService emailService;
+    private final EncryptionService encryptionService;
 
-    private DefaultComboBoxModel<String> comboBoxModelEmails;
-    private DefaultButtonModel buttonModelSend;
+    private final List<PublicKeyEntry> allPublicKeyEntries;
 
-    private JLabel labelEmail = new JLabel("Email: ");
-    private JTextField textEmail = new JTextField(20);
+    private JList listEmails;
+    private ListSelectionModel listSelectionModelEmails;
 
-    private FilePicker filePicker = new FilePicker("Public key file", "Select");
+    private final JLabel labelTo = new JLabel("Send to: ");
+    private final JTextField textTo = new JTextField(20);
 
-    private JButton buttonShare = new JButton("Add");
+    private final JButton buttonShare = new JButton("Share");
 
-    public SharePublicKeysDialog(JFrame parent, EncryptionService encryptionService) {
+    public SharePublicKeysDialog(JFrame parent, EmailService emailService, EncryptionService encryptionService) {
         super(parent, "Adding new public key", true);
         this.parent = parent;
+        this.emailService = emailService;
         this.encryptionService = encryptionService;
+        this.allPublicKeyEntries = encryptionService.getAllPublicKeyEntries();
 
-        this.comboBoxModelEmails = ((SwingPaladinEmail) parent).getComboBoxModelEmails();
-        this.buttonModelSend = ((SwingPaladinEmail) this.parent).getButtonModelSend();
+        listEmails = new JList(getAllEmailsWithPublicKey(allPublicKeyEntries).toArray());
+        listSelectionModelEmails = listEmails.getSelectionModel();
 
         setupForm();
 
@@ -48,21 +52,22 @@ public class SharePublicKeysDialog extends JDialog {
         constraints.insets = new Insets(10, 10, 5, 10);
         constraints.anchor = GridBagConstraints.WEST;
 
-        add(labelEmail, constraints);
-
-        constraints.gridx = 1;
-        add(textEmail, constraints);
+        JScrollPane listPane = new JScrollPane(listEmails);
+        JPanel listContainer = new JPanel(new GridLayout(1,1));
+        listContainer.setBorder(BorderFactory.createTitledBorder("List"));
+        listContainer.add(listPane);
+        add(listContainer);
 
         constraints.gridx = 0;
         constraints.gridy = 1;
-        constraints.gridheight = 1;
-        constraints.gridwidth = 3;
-        filePicker.setMode(FilePicker.MODE_OPEN);
-        add(filePicker, constraints);
+        add(labelTo, constraints);
 
         constraints.gridx = 0;
         constraints.gridy = 2;
-        constraints.gridwidth = 2;
+        add(textTo, constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 3;
         constraints.anchor = GridBagConstraints.CENTER;
         add(buttonShare, constraints);
 
@@ -79,38 +84,44 @@ public class SharePublicKeysDialog extends JDialog {
                 return;
             }
 
-            String publicKeyFilePath = filePicker.getSelectedFilePath();
-            byte[] publicKey = FileUtils.readFileToByteArray(new File(publicKeyFilePath));
+            String toAdress = textTo.getText();
 
-            String email = textEmail.getText();
-
-            encryptionService.addPublicKey(email, publicKey);
-
-            if(comboBoxModelEmails.getSize() == 1){
-                comboBoxModelEmails.removeElement(((SwingPaladinEmail) parent).getPlaceholderEmail());
-                buttonModelSend.setEnabled(true);
+            int minIndex = listSelectionModelEmails.getMinSelectionIndex();
+            int maxIndex = listSelectionModelEmails.getMaxSelectionIndex();
+            for (int i = minIndex; i <= maxIndex; i++) {
+                if (listSelectionModelEmails.isSelectedIndex(i)) {
+                    SignedPublicKeyEntry signedPublicKeyEntry = encryptionService.getSignedPublicKeyEntry(allPublicKeyEntries.get(i));
+                    emailService.sendSignedPublicKey(toAdress, signedPublicKeyEntry);
+                }
             }
-            comboBoxModelEmails.addElement(email);
 
             JOptionPane.showMessageDialog(SharePublicKeysDialog.this,
-                    "New public key was added successfully!");
+                    "Keys were shared successfully!");
             dispose();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this,
-                    "Error while adding new public key: " + e.getMessage(),
+                    "Error while sharing public keys: " + e.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private boolean validateFields() {
-        if (textEmail.getText().equals("")) {
+        if (textTo.getText().equals("")) {
             JOptionPane.showMessageDialog(this,
                     "Please enter To address!",
                     "Error", JOptionPane.ERROR_MESSAGE);
-            textEmail.requestFocus();
+            textTo.requestFocus();
             return false;
         }
 
         return true;
+    }
+
+    private List<String> getAllEmailsWithPublicKey(List<PublicKeyEntry> allPublicKeyEntries){
+        List<String> allEmailsWithPublicKey = new ArrayList<>(allPublicKeyEntries.size());
+        for(PublicKeyEntry publicKeyEntry : allPublicKeyEntries){
+            allEmailsWithPublicKey.add(publicKeyEntry.getEmail());
+        }
+        return allEmailsWithPublicKey;
     }
 }

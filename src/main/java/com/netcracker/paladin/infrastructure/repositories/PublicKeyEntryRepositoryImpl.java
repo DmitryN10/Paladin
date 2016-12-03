@@ -23,6 +23,8 @@ public class PublicKeyEntryRepositoryImpl implements PublicKeyEntryRepository{
     }
 
     public void insert(PublicKeyEntry publicKeyEntry) {
+        deleteByEmail(publicKeyEntry.getEmail());
+
         String sql = "INSERT INTO PUBLICKEYS " + "(EMAIL, PUBLICKEY) VALUES (:email, :publickey)";
 
         Map namedParameters = new HashMap();

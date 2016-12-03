@@ -20,9 +20,6 @@ public class SetPrivateKeyDialog extends JDialog {
     private JButton buttonGenerate = new JButton("Generate key");
 
     private JFileChooser fileChooser = new JFileChooser();
-    private static final int MODE_OPEN = 1;
-    private static final int MODE_SAVE = 2;
-    private int mode = MODE_OPEN;
 
     private File privateKeyFile;
 
@@ -75,14 +72,11 @@ public class SetPrivateKeyDialog extends JDialog {
 
     private void buttonLoadActionPerformed(ActionEvent event) {
         try {
-            if (mode == MODE_OPEN) {
-                if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-                    privateKeyFile = fileChooser.getSelectedFile();
-                }
-            } else if (mode == MODE_SAVE) {
-                if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-                    privateKeyFile = fileChooser.getSelectedFile();
-                }
+            if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                privateKeyFile = fileChooser.getSelectedFile();
+            }else{
+                return;
+//                throw new NoFileSelectedException();
             }
 
             byte[] privateKey = FileUtils.readFileToByteArray(privateKeyFile);
@@ -90,6 +84,10 @@ public class SetPrivateKeyDialog extends JDialog {
 
             JOptionPane.showMessageDialog(SetPrivateKeyDialog.this, "Private key was loaded successfully!");
             dispose();
+//        } catch (NoFileSelectedException nfse){
+//            JOptionPane.showMessageDialog(this,
+//                    "No file was selected. Private key was not loaded",
+//                    "No file selected", JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this,
@@ -110,7 +108,7 @@ public class SetPrivateKeyDialog extends JDialog {
             dispose();
         } catch (NoFileSelectedException nfse){
             JOptionPane.showMessageDialog(this,
-                    "No file was selected. Key was not generated.",
+                    "No file was selected. Private key was not generated.",
                     "No file selected", JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this,
@@ -121,6 +119,7 @@ public class SetPrivateKeyDialog extends JDialog {
 
     private File showSaveFileDialog() throws NoFileSelectedException {
         JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setSelectedFile(new File("myPrivateKey"));
         fileChooser.setDialogTitle("Specify a file to save private key");
 
         int userSelection = fileChooser.showSaveDialog(this);

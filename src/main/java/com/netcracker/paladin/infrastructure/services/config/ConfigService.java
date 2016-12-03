@@ -3,7 +3,6 @@ package com.netcracker.paladin.infrastructure.services.config;
 import com.netcracker.paladin.infrastructure.repositories.ConfigRepository;
 import com.netcracker.paladin.infrastructure.repositories.exceptions.NoSavedConfigPropertiesException;
 
-import java.io.IOException;
 import java.util.Properties;
 
 public class ConfigService {
@@ -30,11 +29,11 @@ public class ConfigService {
         }
     }
 
-    public Properties loadProperties() throws IOException {
+    public Properties loadProperties() {
         return configProperties;
     }
 
-    public void saveProperties(String host, String port, String user, String pass) throws IOException {
+    public void saveProperties(String host, String port, String user, String pass) {
         configProperties.setProperty("mail.smtp.host", host);
         configProperties.setProperty("mail.smtp.port", port);
         configProperties.setProperty("mail.user", user);

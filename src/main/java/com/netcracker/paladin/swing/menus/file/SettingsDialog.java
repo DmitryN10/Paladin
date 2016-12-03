@@ -88,7 +88,7 @@ public class SettingsDialog extends JDialog {
         Properties configProps = null;
         try {
             configProps = configService.loadProperties();
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             JOptionPane.showMessageDialog(this,
                     "Error reading settings: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
@@ -109,7 +109,7 @@ public class SettingsDialog extends JDialog {
             JOptionPane.showMessageDialog(SettingsDialog.this,
                     "Properties were saved successfully!");
             dispose();
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             JOptionPane.showMessageDialog(this,
                     "Error saving properties file: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);

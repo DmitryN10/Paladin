@@ -92,8 +92,18 @@ public class EncryptionServiceImpl implements EncryptionService {
     }
 
     @Override
+    public void addPublicKey(PublicKeyEntry publicKeyEntry){
+        publicKeyEntryRepository.insert(publicKeyEntry);
+    }
+
+    @Override
     public void addPublicKey(String email, byte[] publicKey){
-        publicKeyEntryRepository.insert(new PublicKeyEntry(email, publicKey));
+        addPublicKey(new PublicKeyEntry(email, publicKey));
+    }
+
+    @Override
+    public byte[] getPublicKey(String email){
+        return publicKeyEntryRepository.findByEmail(email).getPublicKey();
     }
 
     @Override
@@ -102,8 +112,13 @@ public class EncryptionServiceImpl implements EncryptionService {
     }
 
     @Override
+    public List<PublicKeyEntry> getAllPublicKeyEntries(){
+        return publicKeyEntryRepository.findAll();
+    }
+
+    @Override
     public List<String> getAllEmailsWithPublicKey(){
-        List<PublicKeyEntry> allPublicKeyEntries = publicKeyEntryRepository.findAll();
+        List<PublicKeyEntry> allPublicKeyEntries = getAllPublicKeyEntries();
         List<String> allEmailsWithPublicKey = new ArrayList<>(allPublicKeyEntries.size());
         for(PublicKeyEntry publicKeyEntry : allPublicKeyEntries){
             allEmailsWithPublicKey.add(publicKeyEntry.getEmail());
@@ -112,19 +127,62 @@ public class EncryptionServiceImpl implements EncryptionService {
     }
 
     @Override
-    public SignedPublicKeyEntry getSignedPublicKeyEntry(String email){
-        byte[] publicKey = publicKeyEntryRepository.findByEmail(email).getPublicKey();
-        byte[] signature = asymmetricEncryption.createSignature(publicKey, privateKey);
-        return new SignedPublicKeyEntry(email, publicKey, signature);
+    public byte[] getSignature(byte[] data){
+        return asymmetricEncryption.createSignature(data, privateKey);
     }
 
     @Override
-    public boolean verifySignature(String email, byte[] signature, byte[] data){
+    public SignedPublicKeyEntry getSignedPublicKeyEntry(String email){
         byte[] publicKey = publicKeyEntryRepository.findByEmail(email).getPublicKey();
+        byte[] emailBytes = email.getBytes();
+        byte[] publicKeyWithEmail = ArrayUtils.addAll(publicKey, emailBytes);
+        byte[] signature = asymmetricEncryption.createSignature(publicKeyWithEmail, privateKey);
+        return new SignedPublicKeyEntry(null, signature, publicKeyWithEmail);
+    }
+
+    @Override
+    public SignedPublicKeyEntry getSignedPublicKeyEntry(PublicKeyEntry publicKeyEntry){
+        String email = publicKeyEntry.getEmail();
+        byte[] publicKey = publicKeyEntry.getPublicKey();
+        byte[] emailBytes = publicKeyEntry.getEmail().getBytes();
+        byte[] publicKeyWithEmail = ArrayUtils.addAll(publicKey, emailBytes);
+        byte[] signature = asymmetricEncryption.createSignature(publicKeyWithEmail, privateKey);
+        return new SignedPublicKeyEntry(null, signature, publicKeyWithEmail);
+    }
+
+    @Override
+    public PublicKeyEntry getPublicKeyEntry(SignedPublicKeyEntry signedPublicKeyEntry){
+        try {
+            byte[] publicKeyWithEmail = signedPublicKeyEntry.getPublicKeyWithEmail();
+            byte[] publicKey = ArrayUtils.subarray(publicKeyWithEmail, 0, 256);
+            String email = new String(ArrayUtils.subarray(publicKeyWithEmail, 256, publicKeyWithEmail.length), "UTF-8");
+            return new PublicKeyEntry(email, publicKey);
+        }catch (Exception e){
+            throw new IllegalStateException(e);
+        }
+    }
+
+    @Override
+    public boolean verifySignature(byte[] publicKey, byte[] signature, byte[] data){
         return asymmetricEncryption.verifySignature(data, signature, publicKey);
     }
 
-    private byte[] findPublicKey(String email){
+    @Override
+    public boolean verifySignature(String signerEmail, byte[] signature, byte[] data){
+        byte[] publicKey = publicKeyEntryRepository.findByEmail(signerEmail).getPublicKey();
+        return verifySignature(publicKey, signature, data);
+    }
+
+    @Override
+    public boolean verifySignature(SignedPublicKeyEntry signedPublicKeyEntry){
+        return verifySignature(
+                signedPublicKeyEntry.getSignerEmail(),
+                signedPublicKeyEntry.getSignature(),
+                signedPublicKeyEntry.getPublicKeyWithEmail());
+    }
+
+    @Override
+    public byte[] findPublicKey(String email){
         return publicKeyEntryRepository.findByEmail(email).getPublicKey();
     }
 }

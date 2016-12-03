@@ -1,12 +1,14 @@
 package com.netcracker.paladin.swing.tabs;
 
 import com.netcracker.paladin.domain.MessageEntry;
+import com.netcracker.paladin.infrastructure.repositories.exceptions.NoPublicKeyForEmailException;
 import com.netcracker.paladin.infrastructure.services.email.EmailService;
 import com.netcracker.paladin.infrastructure.services.encryption.EncryptionService;
 import com.netcracker.paladin.infrastructure.services.encryption.exceptions.NoPrivateKeyException;
 import com.netcracker.paladin.swing.exceptions.NoMessagesException;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.crypto.BadPaddingException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -26,15 +28,17 @@ public class TabRead extends JPanel {
 
     private static final int MIN_DATE_LENGTH = 40;
 
-    private final JLabel labelValueFrom = new JLabel();
-    private final JLabel labelValueSubject = new JLabel();
-    private final JLabel labelValueDate = new JLabel();
-    private final JLabel labelValueNumber = new JLabel();
-
     private final JLabel labelFrom = new JLabel("From: ");
     private final JLabel labelSubject = new JLabel("Subject: ");
     private final JLabel labelDate = new JLabel("Date: ");
+    private final JLabel labelSignature = new JLabel("Signature: ");
     private final JLabel labelNumber = new JLabel("Number: ");
+
+    private final JLabel labelValueFrom = new JLabel();
+    private final JLabel labelValueSubject = new JLabel();
+    private final JLabel labelValueDate = new JLabel();
+    private final JLabel labelValueSignature = new JLabel();
+    private final JLabel labelValueNumber = new JLabel();
 
     private final JButton buttonNewer = new JButton("NEWER");
     private final JButton buttonOlder = new JButton("OLDER");
@@ -80,6 +84,14 @@ public class TabRead extends JPanel {
 
         constraints.gridx = 0;
         constraints.gridy = 3;
+        add(labelSignature, constraints);
+
+        constraints.gridx = 1;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        add(labelValueSignature, constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 4;
         add(labelNumber, constraints);
 
         constraints.gridx = 1;
@@ -114,7 +126,7 @@ public class TabRead extends JPanel {
         });
 
         constraints.gridx = 0;
-        constraints.gridy = 4;
+        constraints.gridy = 5;
         constraints.gridheight = 1;
         constraints.gridwidth = 3;
         constraints.weightx = 1.0;
@@ -199,9 +211,30 @@ public class TabRead extends JPanel {
 
     private void decryptEntry(MessageEntry entry){
         if(entry.getCipherBlob() != null){
-            entry.setDisplayedMessage(encryptionService.decryptEmail(entry.getCipherBlob()));
+            try {
+                entry.setDisplayedMessage(encryptionService.decryptEmail(entry.getCipherBlob()));
+            }catch (Exception e){
+                entry.setDisplayedMessage("Unable to decrypt. Private key can be incorrect");
+            }
+            if(entry.getSignature() == null){
+                entry.setSignatureStatus("no signature");
+            }else{
+                try {
+                    if (encryptionService.verifySignature(
+                            encryptionService.getPublicKey(entry.getFrom()),
+                            entry.getSignature(),
+                            entry.getCipherBlob())) {
+                        entry.setSignatureStatus("correct");
+                    } else {
+                        entry.setSignatureStatus("incorrect");
+                    }
+                } catch (NoPublicKeyForEmailException e){
+                    entry.setSignatureStatus("unknown sender");
+                }
+            }
         }else{
             entry.setDisplayedMessage(entry.getPlainMessage());
+            entry.setSignatureStatus("not encrypted");
         }
 
         if(entry.getDisplayedMessage() == null){
@@ -213,6 +246,7 @@ public class TabRead extends JPanel {
         labelValueFrom.setText(entry.getFrom());
         labelValueSubject.setText(entry.getSubject());
         labelValueDate.setText(StringUtils.rightPad(entry.getSentDate().toString(), MIN_DATE_LENGTH));
+        labelValueSignature.setText(entry.getSignatureStatus());
         labelValueNumber.setText((currentIndex+1)+" out of "+loadedEmailEntries.size());
         textAreaMessage.setText(entry.getDisplayedMessage());
         this.validate();
