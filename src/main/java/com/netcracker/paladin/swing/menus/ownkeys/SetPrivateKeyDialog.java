@@ -80,7 +80,7 @@ public class SetPrivateKeyDialog extends JDialog {
             }
 
             byte[] privateKey = FileUtils.readFileToByteArray(privateKeyFile);
-            encryptionService.setPrivateKey(privateKey);
+            encryptionService.setMainPrivateKey(privateKey);
 
             JOptionPane.showMessageDialog(SetPrivateKeyDialog.this, "Private key was loaded successfully!");
             dispose();

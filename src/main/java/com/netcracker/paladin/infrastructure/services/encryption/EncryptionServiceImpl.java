@@ -12,7 +12,9 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by ivan on 27.11.16.
@@ -23,7 +25,8 @@ public class EncryptionServiceImpl implements EncryptionService {
     private final SymmetricEncryption symmetricEncryption;
     private final SessionKeygen sessionKeygen;
 
-    private byte[] privateKey;
+    private byte[] mainPrivateKey;
+    private Set<byte[]> allPrivateKeys;
 
     public EncryptionServiceImpl(
             PublicKeyEntryRepository publicKeyEntryRepository,
@@ -34,11 +37,12 @@ public class EncryptionServiceImpl implements EncryptionService {
         this.asymmetricEncryption = asymmetricEncryption;
         this.symmetricEncryption = symmetricEncryption;
         this.sessionKeygen = sessionKeygen;
+        this.allPrivateKeys = new HashSet<>();
     }
 
     @Override
     public byte[] encryptEmail(String plainText, String recipient){
-        if(privateKey == null){
+        if(mainPrivateKey == null){
             throw new NoPrivateKeyException();
         }
         try {
@@ -54,14 +58,14 @@ public class EncryptionServiceImpl implements EncryptionService {
 
     @Override
     public String decryptEmail(byte[] cipherTextAndEncryptedSessionKey){
-        if(privateKey == null){
+        if(mainPrivateKey == null){
             throw new NoPrivateKeyException();
         }
         try {
             byte[] encryptedSessionKey = ArrayUtils.subarray(cipherTextAndEncryptedSessionKey, 0, 128);
             byte[] cipherText = ArrayUtils.subarray(cipherTextAndEncryptedSessionKey, 128, cipherTextAndEncryptedSessionKey.length);
 
-            byte[] sessionKey = asymmetricEncryption.decrypt(encryptedSessionKey, privateKey);
+            byte[] sessionKey = asymmetricEncryption.decrypt(encryptedSessionKey, mainPrivateKey);
             byte[] plainText = symmetricEncryption.decrypt(cipherText, sessionKey);
             return new String(plainText, "UTF-8");
         } catch (NoPublicKeyForEmailException e){
@@ -74,21 +78,26 @@ public class EncryptionServiceImpl implements EncryptionService {
 
     @Override
     public byte[] generatePrivateKey(){
-        this.privateKey = asymmetricEncryption.generatePrivateKey();
-        return privateKey;
+        this.mainPrivateKey = asymmetricEncryption.generatePrivateKey();
+        return mainPrivateKey;
+    }
+
+    public void setMainPrivateKey(byte[] mainPrivateKey){
+        this.mainPrivateKey = mainPrivateKey;
+        this.allPrivateKeys.add(mainPrivateKey);
     }
 
     @Override
-    public void setPrivateKey(byte[] privateKey){
-        this.privateKey = privateKey;
+    public void addPrivateKey(byte[] newPrivateKey){
+        this.allPrivateKeys.add(newPrivateKey);
     }
 
     @Override
     public byte[] getOwnPublicKey(){
-        if(privateKey == null){
+        if(mainPrivateKey == null){
             throw new NoPrivateKeyException();
         }
-        return asymmetricEncryption.generatePublicKey(privateKey);
+        return asymmetricEncryption.generatePublicKey(mainPrivateKey);
     }
 
     @Override
@@ -128,7 +137,7 @@ public class EncryptionServiceImpl implements EncryptionService {
 
     @Override
     public byte[] getSignature(byte[] data){
-        return asymmetricEncryption.createSignature(data, privateKey);
+        return asymmetricEncryption.createSignature(data, mainPrivateKey);
     }
 
     @Override
@@ -136,7 +145,7 @@ public class EncryptionServiceImpl implements EncryptionService {
         byte[] publicKey = publicKeyEntryRepository.findByEmail(email).getPublicKey();
         byte[] emailBytes = email.getBytes();
         byte[] publicKeyWithEmail = ArrayUtils.addAll(publicKey, emailBytes);
-        byte[] signature = asymmetricEncryption.createSignature(publicKeyWithEmail, privateKey);
+        byte[] signature = asymmetricEncryption.createSignature(publicKeyWithEmail, mainPrivateKey);
         return new SignedPublicKeyEntry(null, signature, publicKeyWithEmail);
     }
 
@@ -146,7 +155,7 @@ public class EncryptionServiceImpl implements EncryptionService {
         byte[] publicKey = publicKeyEntry.getPublicKey();
         byte[] emailBytes = publicKeyEntry.getEmail().getBytes();
         byte[] publicKeyWithEmail = ArrayUtils.addAll(publicKey, emailBytes);
-        byte[] signature = asymmetricEncryption.createSignature(publicKeyWithEmail, privateKey);
+        byte[] signature = asymmetricEncryption.createSignature(publicKeyWithEmail, mainPrivateKey);
         return new SignedPublicKeyEntry(null, signature, publicKeyWithEmail);
     }
 

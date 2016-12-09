@@ -15,7 +15,9 @@ public interface EncryptionService {
 
     byte[] generatePrivateKey();
 
-    void setPrivateKey(byte[] privateKey);
+    void setMainPrivateKey(byte[] mainPrivateKey);
+
+    void addPrivateKey(byte[] newPrivateKey);
 
     byte[] getOwnPublicKey();
 
